@@ -1,0 +1,9 @@
+client/node_modules/*
+client/build/*
+client/dist/*
+server/node_modules/*
+server/build/*
+server/dist/*
+*/.git/
+.gitignore
+Dockerfile
