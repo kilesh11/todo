@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { Route } from 'react-router-dom';
+import ProtectedRoute from './Component/ProtectedRoute';
 import Login from './Component/Login';
 import Todo from './Component/Todo';
 import { useAuth } from './Context/AuthContext';
@@ -23,7 +24,7 @@ const App = () => {
     ) : (
         <Fragment>
             <Route path="/login" exact component={Login} />
-            <Route path="/" exact component={Todo} />
+            <ProtectedRoute path="/" exact component={Todo} />
         </Fragment>
     );
 };

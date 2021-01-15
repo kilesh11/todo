@@ -6,7 +6,7 @@ interface IAuthContext {
     isAuth: boolean;
     isFetching: boolean;
     setIsAuth: Dispatch<boolean>;
-    verify: () => Promise<void>;
+    verify: () => Promise<boolean>;
     logout: () => Promise<void>;
 }
 
@@ -14,7 +14,7 @@ const AuthContext = createContext<IAuthContext>({
     isAuth: false,
     isFetching: true,
     setIsAuth: () => false,
-    verify: async () => {},
+    verify: async () => false,
     logout: async () => {},
 });
 
@@ -35,7 +35,9 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         setIsFetching(false);
         if (data?.data?.success) {
             setIsAuth(true);
+            return true;
         }
+        return false;
     };
 
     const logout = async () => {
@@ -43,6 +45,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         setIsFetching(false);
         if (data?.data?.success) {
             setIsAuth(false);
+            history.push('/login');
         }
     };
 
