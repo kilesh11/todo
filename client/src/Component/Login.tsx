@@ -22,13 +22,12 @@ enum LoginMode {
 }
 
 const Login = () => {
-    const { isAuth, setIsAuth, logout } = useAuth();
+    const { setIsAuth } = useAuth();
     let history = useHistory();
     const [loginMode, setLoginMode] = useState(LoginMode.SignIn);
 
     const signIn = useCallback(
         async ({ name, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
-            console.log('kyle_debug ~ file: App.tsx ~ line 63 ~ App ~ signIn');
             const { data } = await axios.post('/auth/login', {
                 name,
                 password,
@@ -46,13 +45,12 @@ const Login = () => {
                     });
                 }
             } else {
-                console.log('kyle_debug ~ file: App.tsx ~ line 46 ~ App ~ data', data.data);
                 setIsAuth(true);
                 history.push('/');
             }
             setSubmitting(false);
         },
-        [setIsAuth, history]
+        [setIsAuth, history],
     );
 
     const register = useCallback(
@@ -167,21 +165,6 @@ const Login = () => {
                                         style={{ color: '#4E3C36', marginBottom: 60 }}
                                     />
                                     <div style={{ alignSelf: 'flex-end' }}>
-                                        {loginMode === LoginMode.SignIn && isAuth && (
-                                            <Button
-                                                disabled={isSubmitting}
-                                                onClick={logout}
-                                                style={{
-                                                    width: '50px',
-                                                    height: '35px',
-                                                    backgroundColor: '#E85A4F',
-                                                    color: 'white',
-                                                    marginRight: 10,
-                                                }}
-                                            >
-                                                test
-                                            </Button>
-                                        )}
                                         <Button
                                             disabled={isSubmitting}
                                             type="submit"

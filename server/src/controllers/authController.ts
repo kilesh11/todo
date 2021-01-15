@@ -5,7 +5,7 @@ import passport from 'passport';
 
 const createJWT = (user: IUser) => {
     return jwt.sign({ id: user.id, name: user.name }, process.env.JWTSECRET as string, {
-        expiresIn: '15s',
+        expiresIn: '15m',
     });
 };
 

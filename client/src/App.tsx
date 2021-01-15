@@ -17,9 +17,8 @@ import { useAuth } from './Context/AuthContext';
 // #E85A4F
 
 const App = () => {
-    const { isFetching } = useAuth();
-
-    return isFetching ? (
+    const { isLoading } = useAuth();
+    return isLoading ? (
         <span />
     ) : (
         <Fragment>
