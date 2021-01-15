@@ -57,10 +57,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         (response) => {
             if (!response?.data?.success) {
                 if (['unauthorized', 'TokenExpiredError'].includes(response?.data?.msg)) {
-                    console.log(
-                        'kyle_debug ~ file: AuthContext.tsx ~ line 41 ~ response?.data?.msg',
-                        response?.data?.msg,
-                    );
                     history.push('/login');
                 }
                 return response;
@@ -71,7 +67,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
             if (error.response.status === 401) {
                 history.push('/login');
             }
-            // return error;
+            return error;
         },
     );
 

@@ -162,6 +162,7 @@ const Login = () => {
                                         type="password"
                                         label="Password"
                                         name="password"
+                                        autoComplete="off"
                                         style={{ color: '#4E3C36', marginBottom: 60 }}
                                     />
                                     <div style={{ alignSelf: 'flex-end' }}>
