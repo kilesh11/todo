@@ -9,7 +9,7 @@ RUN yarn install
 
 COPY client/. .
 
-CMD ["yarn", "build"]
+RUN yarn build
 
 #=============================================================
 
