@@ -1,5 +1,19 @@
 
-FROM node:lts-alpine as server
+FROM node:lts-alpine
+
+WORKDIR /usr/src/app
+
+COPY /client/package.json /client/yarn.lock ./
+
+RUN yarn install
+
+COPY client/. .
+
+CMD ["yarn", "build"]
+
+#=============================================================
+
+FROM node:lts-alpine
 
 WORKDIR /usr/src/app
 
@@ -9,20 +23,13 @@ RUN yarn install
 
 COPY server/. .
 
-CMD ["yarn", "start"]
+RUN yarn build
 
-#=============================================================
+COPY --from=0 /usr/src/app/build /usr/src/app/dist/build
 
-FROM node:lts-alpine as client
+EXPOSE 80
 
-WORKDIR /usr/src/app
+CMD ["yarn", "run", "prod" ]
 
-COPY /client/package.json /client/yarn.lock ./
 
-RUN yarn cache clean \
-    yarn install
-
-COPY client/. .
-
-CMD ["yarn", "start"]
 

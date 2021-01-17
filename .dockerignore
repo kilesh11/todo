@@ -7,3 +7,4 @@ server/dist/*
 */.git/
 .gitignore
 Dockerfile
+Dockerfile.dev

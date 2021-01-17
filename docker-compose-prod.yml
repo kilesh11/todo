@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+    prod_server:
+        build:
+            context: .
+        ports:
+            - '80:80'
+        env_file:
+            - ./server/config.env
+        tty: true
+        command: yarn prod

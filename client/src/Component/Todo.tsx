@@ -4,7 +4,7 @@ import { useAuth } from '../Context/AuthContext';
 
 const Todo = () => {
     const [count, setCount] = useState(0);
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
     // #F56A57
     // #4E3C36
     // #F7EADC
@@ -28,6 +28,7 @@ const Todo = () => {
                 backgroundColor: '#EAE7DC',
             }}
         >
+            <Typography style={{ fontSize: 60 }}>Hi {user.name}</Typography>
             <Typography style={{ fontSize: 50 }}>
                 Edit <code>src/App.tsx</code> and save to reload.
             </Typography>

@@ -2,15 +2,20 @@ import { model, Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
+    email: string;
     name: string;
     password: string;
     matchPassword: (enteredPassword: string) => Promise<boolean>;
 }
 
-const userSchema = new Schema({
-    name: {
+const UserSchema: Schema<IUser> = new Schema({
+    email: {
         type: String,
         unique: true,
+        required: true,
+    },
+    name: {
+        type: String,
         required: true,
     },
     password: {
@@ -19,7 +24,7 @@ const userSchema = new Schema({
     },
 });
 
-userSchema.pre<IUser>('save', async function (next) {
+UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
@@ -29,8 +34,8 @@ userSchema.pre<IUser>('save', async function (next) {
     next();
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
+UserSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-export default model<IUser>('User', userSchema);
+export default model<IUser>('User', UserSchema);

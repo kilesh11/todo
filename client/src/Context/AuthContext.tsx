@@ -5,7 +5,12 @@ import axios from 'axios';
 interface IAuthContext {
     isAuth: boolean;
     isLoading: boolean;
+    user: {
+        name: string;
+        email: string;
+    };
     setIsAuth: Dispatch<boolean>;
+    setUser: Dispatch<{ name: string; email: string }>;
     verify: () => Promise<boolean>;
     logout: () => Promise<void>;
 }
@@ -13,6 +18,11 @@ interface IAuthContext {
 const AuthContext = createContext<IAuthContext>({
     isAuth: false,
     isLoading: true,
+    user: {
+        name: '',
+        email: '',
+    },
+    setUser: () => ({ name: '', email: '' }),
     setIsAuth: () => false,
     verify: async () => false,
     logout: async () => {},
@@ -28,6 +38,7 @@ export const useAuth = () => {
 export const AuthProvider: FunctionComponent = ({ children }) => {
     const [isAuth, setIsAuth] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState({ name: '', email: '' });
     let history = useHistory();
 
     const verify = async () => {
@@ -35,6 +46,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         if (data?.data?.success) {
             setIsAuth(true);
             setIsLoading(false);
+            setUser({ name: data.data.name, email: data.data.email });
             return true;
         }
         setIsLoading(false);
@@ -72,7 +84,9 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     );
 
     return (
-        <AuthContext.Provider value={{ isAuth, setIsAuth, isLoading, verify, logout }}>
+        <AuthContext.Provider
+            value={{ isAuth, setIsAuth, setUser, isLoading, verify, logout, user }}
+        >
             {children}
         </AuthContext.Provider>
     );

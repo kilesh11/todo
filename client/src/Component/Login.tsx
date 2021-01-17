@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useAuth } from '../Context/AuthContext';
 
 interface Values {
+    email: string;
     name: string;
     password: string;
 }
@@ -22,46 +23,49 @@ enum LoginMode {
 }
 
 const Login = () => {
-    const { setIsAuth } = useAuth();
+    const { setIsAuth, setUser } = useAuth();
     let history = useHistory();
     const [loginMode, setLoginMode] = useState(LoginMode.SignIn);
 
     const signIn = useCallback(
-        async ({ name, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
+        async ({ email, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
             const { data } = await axios.post('/auth/login', {
-                name,
+                email,
                 password,
             });
             if (!data.success) {
                 if (data.msg === 'userNotExist') {
                     setErrors({
-                        name: 'incorrect email',
+                        email: 'incorrect email',
                         password: '',
                     });
                 } else if (data.msg === 'passwordIncorrect') {
                     setErrors({
-                        name: '',
+                        email: '',
                         password: 'incorrect password',
                     });
                 }
             } else {
                 setIsAuth(true);
+                setUser(data.data);
                 history.push('/');
             }
             setSubmitting(false);
         },
-        [setIsAuth, history],
+        [setIsAuth, setUser, history],
     );
 
     const register = useCallback(
-        async ({ name, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
+        async ({ email, name, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
             const { data } = await axios.post('/auth/register', {
+                email,
                 name,
                 password,
             });
-            if (!data.success) {
+            if (!data?.success) {
                 setErrors({
-                    name: 'This email already exists.',
+                    email: 'This email already exists.',
+                    name: '',
                     password: '',
                 });
             }
@@ -101,23 +105,30 @@ const Login = () => {
                 >
                     <Formik
                         initialValues={{
+                            email: '',
                             name: '',
                             password: '',
                         }}
                         validate={(values) => {
                             const errors: Partial<Values> = {};
-                            if (!values.name) {
-                                errors.name = 'Required';
+                            if (!values.email) {
+                                errors.email = 'Required';
                             } else if (!values.password) {
                                 errors.password = 'Required';
+                            } else if (!values.name && loginMode === LoginMode.SignUp) {
+                                errors.name = 'Required';
                             } else if (
-                                !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.name)
+                                !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
                             ) {
-                                errors.name = 'Invalid email address';
+                                errors.email = 'Invalid email address';
                             }
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
+                            console.log(
+                                'kyle_debug ~ file: Login.tsx ~ line 136 ~ Login ~ values',
+                                values,
+                            );
                             setTimeout(() => {
                                 if (loginMode === LoginMode.SignIn) {
                                     signIn(values, { setSubmitting, setErrors });
@@ -152,11 +163,23 @@ const Login = () => {
                                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                                     <Field
                                         component={TextField}
-                                        name="name"
+                                        name="email"
                                         type="email"
                                         label="Email"
                                         style={{ color: '#4E3C36', marginBottom: 20 }}
                                     />
+                                    {loginMode === LoginMode.SignUp && (
+                                        <Field
+                                            component={TextField}
+                                            name="name"
+                                            type="name"
+                                            label="Name"
+                                            style={{
+                                                color: '#4E3C36',
+                                                marginBottom: 20,
+                                            }}
+                                        />
+                                    )}
                                     <Field
                                         component={TextField}
                                         type="password"

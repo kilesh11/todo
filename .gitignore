@@ -23,6 +23,7 @@ server/coverage
 
 # production
 server/build
+server/dist
 
 # misc
 .vscode

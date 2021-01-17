@@ -1,6 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
-// import path from "path";
+import path from 'path';
 import router from './routes/router';
 import connectMongo from './config/db';
 import passport from 'passport';
@@ -12,7 +12,7 @@ class App {
     constructor() {
         this.app = express();
         this.middlewareSetup();
-        // this.assetSetup();
+        this.assetSetup();
         this.routerSetup();
     }
 
@@ -23,20 +23,20 @@ class App {
         passport.use(jwtStrategy);
     }
 
-    // private assetSetup(): void {
-    //     this.app.use(express.static(path.join(__dirname, 'build')));
-    // }
+    private assetSetup(): void {
+        this.app.use(express.static(path.join(__dirname, 'build')));
+    }
 
     private routerSetup(): void {
         for (const route of router) {
             this.app.use(route.getPath(), route.getRouter());
         }
         //default return
-        // if (process.env.NODE_ENV === 'production') {
-        //     this.app.get('/*', (req, res) => {
-        //         res.sendFile(path.join(__dirname, 'build', 'index.html'));
-        //     });
-        // }
+        if (process.env.NODE_ENV === 'production') {
+            this.app.get('/*', (req, res) => {
+                res.sendFile(path.join(__dirname, 'build', 'index.html'));
+            });
+        }
     }
 }
 
