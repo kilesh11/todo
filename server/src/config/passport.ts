@@ -3,13 +3,8 @@ import { Strategy, StrategyOptions } from 'passport-jwt';
 import User, { IUser } from '../models/user';
 
 const cookieExtractor = (req: Request) => {
-    console.log(
-        'kyle_debug ~ file: passport.ts ~ line 6 ~ cookieExtractor ~ req.cookies',
-        req.cookies,
-    );
     let token = null;
     if (req && req.cookies) token = req.cookies['token'];
-    console.log('kyle_debug ~ file: passport.ts ~ line 12 ~ cookieExtractor ~ token', token);
     return token;
 };
 
