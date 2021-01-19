@@ -1,26 +1,11 @@
 version: '3.8'
 services:
-    server:
+    prod_server:
         build:
             context: .
-            dockerfile: Dockerfile.dev
-            target: server
-        volumes:
-            - ./server:/usr/src/app
         ports:
-            - '5000:5000'
+            - '80:80'
         env_file:
             - ./server/config.env
         tty: true
-        command: yarn start
-    client:
-        build:
-            context: .
-            dockerfile: Dockerfile.dev
-            target: client
-        volumes:
-            - ./client:/usr/src/app
-        ports:
-            - '3000:3000'
-        tty: true
-        command: yarn start
+        command: yarn prod

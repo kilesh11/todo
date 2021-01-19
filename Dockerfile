@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 COPY /client/package.json /client/yarn.lock ./
 
-RUN yarn install
+RUN yarn --verbose
 
 COPY client/. .
 
@@ -19,7 +19,7 @@ WORKDIR /usr/src/app
 
 COPY /server/package.json /server/yarn.lock ./
 
-RUN yarn install
+RUN yarn --verbose
 
 COPY server/. .
 
