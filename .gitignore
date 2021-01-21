@@ -35,7 +35,6 @@ server/dist
 .env.production.local
 config.env
 docker-compose.yml
-Dockerfile
 
 npm-debug.log*
 yarn-debug.log*
