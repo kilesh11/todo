@@ -66,15 +66,13 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     };
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged(function (user) {
-            console.log('kyle_debug ~ file: AuthContext.tsx ~ line 74 ~ user', user);
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 setUser(user);
-                setIsLoading(false);
             } else {
                 setUser(null);
-                setIsLoading(false);
             }
+            setIsLoading(false);
         });
     }, []);
 
