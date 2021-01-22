@@ -4,7 +4,6 @@ import axios from 'axios';
 
 interface IAuthContext {
     isAuth: boolean;
-    isLoading: boolean;
     user: {
         name: string;
         email: string;
@@ -17,7 +16,6 @@ interface IAuthContext {
 
 const AuthContext = createContext<IAuthContext>({
     isAuth: false,
-    isLoading: true,
     user: {
         name: '',
         email: '',
@@ -84,10 +82,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     );
 
     return (
-        <AuthContext.Provider
-            value={{ isAuth, setIsAuth, setUser, isLoading, verify, logout, user }}
-        >
-            {children}
+        <AuthContext.Provider value={{ isAuth, setIsAuth, setUser, verify, logout, user }}>
+            {isLoading ? <span /> : children}
         </AuthContext.Provider>
     );
 };
