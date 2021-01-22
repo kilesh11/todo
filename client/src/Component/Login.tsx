@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react';
 import { Button, CircularProgress, Tabs, Tab } from '@material-ui/core';
 import { Formik, Form, Field, FormikErrors } from 'formik';
 import { TextField } from 'formik-material-ui';
-import { useHistory } from 'react-router-dom';
-import axios from 'axios';
+// import { useHistory } from 'react-router-dom';
+// import axios from 'axios';
 import { wrapper } from '../Utility/common';
 import { useAuth } from '../Context/AuthContext';
 
@@ -24,36 +24,38 @@ enum LoginMode {
 }
 
 const Login = () => {
-    const { setIsAuth, setUser, register } = useAuth();
-    let history = useHistory();
+    const { register, logIn } = useAuth();
+    // let history = useHistory();
     const [loginMode, setLoginMode] = useState(LoginMode.SignIn);
 
     const signIn = useCallback(
         async ({ email, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
-            const { data } = await axios.post('/auth/login', {
-                email,
-                password,
-            });
-            if (!data.success) {
-                if (data.msg === 'userNotExist') {
-                    setErrors({
-                        email: 'incorrect email',
-                        password: '',
-                    });
-                } else if (data.msg === 'passwordIncorrect') {
-                    setErrors({
-                        email: '',
-                        password: 'incorrect password',
-                    });
+            const { error } = await wrapper(logIn(email, password));
+            if (error) {
+                let errorMsg = {
+                    email: '',
+                    password: '',
+                    confirmpassword: '',
+                };
+                switch (error.code) {
+                    case 'auth/user-disabled':
+                        errorMsg.email = 'This user is disabled.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMsg.email = 'This email is invalid.';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMsg.email = 'There is no user registered with this email';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMsg.password = 'Invalid Password';
+                        break;
                 }
-            } else {
-                setIsAuth(true);
-                setUser(data.data);
-                history.push('/');
+                setErrors(errorMsg);
             }
             setSubmitting(false);
         },
-        [setIsAuth, setUser, history],
+        [logIn],
     );
 
     const signUp = useCallback(
@@ -141,13 +143,11 @@ const Login = () => {
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            setTimeout(() => {
-                                if (loginMode === LoginMode.SignIn) {
-                                    signIn(values, { setSubmitting, setErrors });
-                                } else if (loginMode === LoginMode.SignUp) {
-                                    signUp(values, { setSubmitting, setErrors });
-                                }
-                            }, 1000);
+                            if (loginMode === LoginMode.SignIn) {
+                                signIn(values, { setSubmitting, setErrors });
+                            } else if (loginMode === LoginMode.SignUp) {
+                                signUp(values, { setSubmitting, setErrors });
+                            }
                         }}
                     >
                         {({ submitForm, isSubmitting, resetForm }) => (

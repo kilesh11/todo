@@ -46,27 +46,28 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     // };
 
     const register = async (email: string, password: string) => {
-        const { data, error } = await wrapper(auth.createUserWithEmailAndPassword(email, password));
+        const { error } = await wrapper(auth.createUserWithEmailAndPassword(email, password));
+
         if (error) {
             return Promise.reject(error);
         } else {
-            setUser(data);
             history.push('/');
         }
     };
 
     const logIn = async (email: string, password: string) => {
-        const { data, error } = await wrapper(auth.signInWithEmailAndPassword(email, password));
+        const { error } = await wrapper(auth.signInWithEmailAndPassword(email, password));
+
         if (error) {
             return Promise.reject(error);
         } else {
-            setUser(data);
             history.push('/');
         }
     };
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
+            console.log('kyle_debug ~ file: AuthContext.tsx ~ line 74 ~ user', user);
             if (user) {
                 setUser(user);
                 setIsLoading(false);
