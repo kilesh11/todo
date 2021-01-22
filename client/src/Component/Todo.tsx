@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Typography } from '@material-ui/core';
+import { auth } from '../Utility/firebase';
 import { useAuth } from '../Context/AuthContext';
 
 const Todo = () => {
     const [count, setCount] = useState(0);
-    const { logout, user } = useAuth();
+    const { user } = useAuth();
     // #F56A57
     // #4E3C36
     // #F7EADC
@@ -28,7 +29,7 @@ const Todo = () => {
                 backgroundColor: '#EAE7DC',
             }}
         >
-            <Typography style={{ fontSize: 60 }}>Hi {user.name}</Typography>
+            <Typography style={{ fontSize: 60 }}>Hi {user?.email}</Typography>
             <Typography style={{ fontSize: 50 }}>
                 Edit <code>src/App.tsx</code> and save to reload.
             </Typography>
@@ -41,7 +42,12 @@ const Todo = () => {
                 <Typography style={{ color: 'white', fontSize: 40 }}>Press to increment</Typography>
             </Button>
             <Typography style={{ fontSize: 40 }}>{count}</Typography>
-            <Button onClick={logout} style={{ backgroundColor: '#122d54' }}>
+            <Button
+                onClick={() => {
+                    auth.signOut();
+                }}
+                style={{ backgroundColor: '#122d54' }}
+            >
                 <Typography style={{ color: 'white', fontSize: 40 }}>Press to Logout</Typography>
             </Button>
         </div>

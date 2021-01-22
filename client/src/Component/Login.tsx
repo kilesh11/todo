@@ -4,12 +4,13 @@ import { Formik, Form, Field, FormikErrors } from 'formik';
 import { TextField } from 'formik-material-ui';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
+import { wrapper } from '../Utility/common';
 import { useAuth } from '../Context/AuthContext';
 
 interface Values {
     email: string;
-    name: string;
     password: string;
+    confirmPassword: string;
 }
 
 interface FormikHelper {
@@ -23,7 +24,7 @@ enum LoginMode {
 }
 
 const Login = () => {
-    const { setIsAuth, setUser } = useAuth();
+    const { setIsAuth, setUser, register } = useAuth();
     let history = useHistory();
     const [loginMode, setLoginMode] = useState(LoginMode.SignIn);
 
@@ -55,23 +56,31 @@ const Login = () => {
         [setIsAuth, setUser, history],
     );
 
-    const register = useCallback(
-        async ({ email, name, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
-            const { data } = await axios.post('/auth/register', {
-                email,
-                name,
-                password,
-            });
-            if (!data?.success) {
-                setErrors({
-                    email: 'This email already exists.',
-                    name: '',
+    const signUp = useCallback(
+        async ({ email, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
+            const { error } = await wrapper(register(email, password));
+            if (error) {
+                let errorMsg = {
+                    email: '',
                     password: '',
-                });
+                    confirmpassword: '',
+                };
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMsg.email = 'This email already exists.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMsg.email = 'This email is invalid.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMsg.password = 'Password is too weak';
+                        break;
+                }
+                setErrors(errorMsg);
             }
             setSubmitting(false);
         },
-        [],
+        [register],
     );
 
     return (
@@ -106,8 +115,8 @@ const Login = () => {
                     <Formik
                         initialValues={{
                             email: '',
-                            name: '',
                             password: '',
+                            confirmPassword: '',
                         }}
                         validate={(values) => {
                             const errors: Partial<Values> = {};
@@ -115,25 +124,28 @@ const Login = () => {
                                 errors.email = 'Required';
                             } else if (!values.password) {
                                 errors.password = 'Required';
-                            } else if (!values.name && loginMode === LoginMode.SignUp) {
-                                errors.name = 'Required';
+                            } else if (!values.confirmPassword && loginMode === LoginMode.SignUp) {
+                                errors.confirmPassword = 'Required';
                             } else if (
                                 !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
                             ) {
                                 errors.email = 'Invalid email address';
+                            } else if (
+                                values.confirmPassword !== values.password &&
+                                loginMode === LoginMode.SignUp
+                            ) {
+                                errors.password = 'Password did not match with Confirm Password';
+                                errors.confirmPassword =
+                                    'Password did not match with Confirm Password';
                             }
                             return errors;
                         }}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
-                            console.log(
-                                'kyle_debug ~ file: Login.tsx ~ line 136 ~ Login ~ values',
-                                values,
-                            );
                             setTimeout(() => {
                                 if (loginMode === LoginMode.SignIn) {
                                     signIn(values, { setSubmitting, setErrors });
                                 } else if (loginMode === LoginMode.SignUp) {
-                                    register(values, { setSubmitting, setErrors });
+                                    signUp(values, { setSubmitting, setErrors });
                                 }
                             }, 1000);
                         }}
@@ -168,27 +180,28 @@ const Login = () => {
                                         label="Email"
                                         style={{ color: '#4E3C36', marginBottom: 20 }}
                                     />
-                                    {loginMode === LoginMode.SignUp && (
-                                        <Field
-                                            component={TextField}
-                                            name="name"
-                                            type="name"
-                                            label="Name"
-                                            style={{
-                                                color: '#4E3C36',
-                                                marginBottom: 20,
-                                            }}
-                                        />
-                                    )}
                                     <Field
                                         component={TextField}
                                         type="password"
                                         label="Password"
                                         name="password"
                                         autoComplete="off"
-                                        style={{ color: '#4E3C36', marginBottom: 60 }}
+                                        style={{ color: '#4E3C36', marginBottom: 20 }}
                                     />
-                                    <div style={{ alignSelf: 'flex-end' }}>
+                                    {loginMode === LoginMode.SignUp && (
+                                        <Field
+                                            component={TextField}
+                                            name="confirmPassword"
+                                            type="password"
+                                            label="Confirm Password"
+                                            autoComplete="off"
+                                            style={{
+                                                color: '#4E3C36',
+                                                marginBottom: 20,
+                                            }}
+                                        />
+                                    )}
+                                    <div style={{ alignSelf: 'flex-end', marginTop: 40 }}>
                                         <Button
                                             disabled={isSubmitting}
                                             type="submit"
@@ -210,7 +223,11 @@ const Login = () => {
                                                     }}
                                                 />
                                             ) : (
-                                                <span>Submit</span>
+                                                <span>
+                                                    {loginMode === LoginMode.SignUp
+                                                        ? 'Register'
+                                                        : 'Submit'}
+                                                </span>
                                             )}
                                         </Button>
                                     </div>
