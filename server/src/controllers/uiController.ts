@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
-import { IUser } from '../models/user';
+import { Response } from 'express';
+import { IFirebaseRequset } from '../interface/firebase';
 
 class UIController {
-    public verifyUser(req: Request, res: Response): Response {
-        const user = req.user as IUser;
-        return res.status(201).json({ success: true, name: user.name, email: user.email });
+    public verifyUser(req: IFirebaseRequset, res: Response): Response {
+        const user = req?.currentUser;
+        return res.status(201).json({ success: true, uid: user?.uid, email: user?.email });
     }
 }
 

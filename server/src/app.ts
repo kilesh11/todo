@@ -3,8 +3,9 @@ import morgan from 'morgan';
 import path from 'path';
 import router from './routes/router';
 import connectMongo from './config/db';
-import passport from 'passport';
-import { jwtStrategy } from './config/passport';
+// import { checkAuth } from './middleware/fireabase';
+// import passport from 'passport';
+// import { jwtStrategy } from './config/passport';
 
 class App {
     public app: express.Application;
@@ -19,8 +20,9 @@ class App {
     private middlewareSetup(): void {
         this.app.use(morgan('dev'));
         connectMongo();
-        this.app.use(passport.initialize());
-        passport.use(jwtStrategy);
+        // this.app.use(checkAuth);
+        // this.app.use(passport.initialize());
+        // passport.use(jwtStrategy);
     }
 
     private assetSetup(): void {
