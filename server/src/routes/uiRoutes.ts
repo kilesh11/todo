@@ -1,12 +1,13 @@
 import MainRoute from './route.abstract';
 import UIController from '../controllers/uiController';
-import AuthController from '../controllers/authController';
+// import AuthController from '../controllers/authController';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import { checkAuth } from '../middleware/fireabase';
 
 class UIRoutes extends MainRoute {
     private uiController: UIController = new UIController();
-    private authController: AuthController = new AuthController();
+    // private authController: AuthController = new AuthController();
 
     constructor() {
         super();
@@ -17,9 +18,7 @@ class UIRoutes extends MainRoute {
     protected setRoutes(): void {
         this.getRouter().use(cookieParser());
         this.getRouter().use(bodyParser.json());
-        this.getRouter()
-            .route('/verify')
-            .get(this.authController.authenticateJWT, this.uiController.verifyUser);
+        this.getRouter().route('/verify').get(checkAuth, this.uiController.verifyUser);
     }
 }
 

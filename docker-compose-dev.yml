@@ -10,7 +10,7 @@ services:
         ports:
             - '5000:5000'
         env_file:
-            - ./config.env
+            - ./.env.development.local
         tty: true
         command: yarn start
     client:
