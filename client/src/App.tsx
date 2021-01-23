@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { Route } from 'react-router-dom';
 import ProtectedRoute from './Component/ProtectedRoute';
 import Login from './Component/Login';
@@ -17,10 +16,10 @@ import Todo from './Component/Todo';
 
 const App = () => {
     return (
-        <Fragment>
+        <>
             <Route path="/login" exact component={Login} />
             <ProtectedRoute path="/" exact component={Todo} />
-        </Fragment>
+        </>
     );
 };
 
