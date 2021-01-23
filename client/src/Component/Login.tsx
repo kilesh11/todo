@@ -4,6 +4,7 @@ import { Formik, Form, Field, FormikErrors } from 'formik';
 import { TextField } from 'formik-material-ui';
 // import { useHistory } from 'react-router-dom';
 // import axios from 'axios';
+import SignInButton from '../Image/google_signIn_dark.png';
 import { wrapper } from '../Utility/common';
 import { useAuth } from '../Context/AuthContext';
 
@@ -201,15 +202,29 @@ const Login = () => {
                                             }}
                                         />
                                     )}
-                                    <div style={{ alignSelf: 'flex-end', marginTop: 40 }}>
+                                    <div
+                                        style={{
+                                            alignSelf: 'flex-end',
+                                            marginTop: 40,
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        {loginMode === LoginMode.SignIn && (
+                                            <img
+                                                src={SignInButton}
+                                                onClick={submitForm}
+                                                alt="Logo"
+                                                style={{ cursor: 'pointer' }}
+                                            />
+                                        )}
                                         <Button
                                             disabled={isSubmitting}
                                             type="submit"
                                             onClick={submitForm}
                                             style={{
-                                                width: '100px',
-                                                height: '35px',
-
+                                                padding: '0px 20px',
+                                                height: '40px',
+                                                margin: '3px 0px 3px 10px',
                                                 backgroundColor: '#E85A4F',
                                                 color: 'white',
                                             }}

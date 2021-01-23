@@ -6,19 +6,15 @@ import firebase from 'firebase/app';
 import axios from 'axios';
 
 interface IAuthContext {
-    isAuth: boolean;
     user: firebase.User | null;
-    setIsAuth: Dispatch<boolean>;
     setUser: Dispatch<firebase.User | null>;
     register: (email: string, password: string) => Promise<void>;
     logIn: (email: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<IAuthContext>({
-    isAuth: false,
     user: null,
     setUser: () => null,
-    setIsAuth: () => false,
     register: async () => {},
     logIn: async () => {},
 });
@@ -28,7 +24,6 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: FunctionComponent = ({ children }) => {
-    const [isAuth, setIsAuth] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<firebase.User | null>(null);
     let history = useHistory();
@@ -36,7 +31,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     // const verify = async () => {
     //     const { data } = await wrapper(axios.get('/ui/verify'));
     //     if (data?.data?.success) {
-    //         setIsAuth(true);
     //         setIsLoading(false);
     //         setUser({ name: data.data.name, email: data.data.email });
     //         return true;
@@ -66,7 +60,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     };
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged((user) => {
+        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 setUser(user);
             } else {
@@ -74,6 +68,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
             }
             setIsLoading(false);
         });
+        return () => unsubscribe();
     }, []);
 
     axios.interceptors.response.use(
@@ -95,7 +90,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     );
 
     return (
-        <AuthContext.Provider value={{ isAuth, setIsAuth, setUser, register, logIn, user }}>
+        <AuthContext.Provider value={{ setUser, register, logIn, user }}>
             {isLoading ? <span /> : children}
         </AuthContext.Provider>
     );
