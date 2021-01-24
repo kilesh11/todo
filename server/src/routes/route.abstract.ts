@@ -1,20 +1,20 @@
-import {Router} from "express";
+import { Router } from 'express';
 
 abstract class MainRoute {
-    private path = '/api';
-    private router: Router = Router();
+    #path = '/api';
+    #router: Router = Router();
     protected abstract setRoutes(): void;
 
-    protected setPath(pathName: string): void {
-        this.path = pathName;
+    set path(pathName: string) {
+        this.#path = pathName;
     }
 
-    public getPath(): string {
-        return this.path;
+    get path(): string {
+        return this.#path;
     }
 
-    public getRouter(): Router {
-        return this.router;
+    get router(): Router {
+        return this.#router;
     }
 }
 

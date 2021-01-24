@@ -1,7 +1,7 @@
 import { Route } from 'react-router-dom';
 import ProtectedRoute from './Component/ProtectedRoute';
-import Login from './Component/Login';
-import Todo from './Component/Todo';
+import LoginApp from './Component/LoginApp';
+import TodoApp from './Component/TodoApp';
 
 // #F56A57
 // #4E3C36
@@ -17,8 +17,8 @@ import Todo from './Component/Todo';
 const App = () => {
     return (
         <>
-            <Route path="/login" exact component={Login} />
-            <ProtectedRoute path="/" exact component={Todo} />
+            <Route path="/login" exact component={LoginApp} />
+            <ProtectedRoute path="/" exact component={TodoApp} />
         </>
     );
 };

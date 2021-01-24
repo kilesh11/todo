@@ -5,7 +5,7 @@ import { auth } from '../Utility/firebase';
 import { useAuth } from '../Context/AuthContext';
 import { wrapper } from '../Utility/common';
 
-const Todo = () => {
+const TodoApp = () => {
     const [count, setCount] = useState(0);
     const [uid, setUid] = useState('');
     const { user } = useAuth();
@@ -77,4 +77,4 @@ const Todo = () => {
     );
 };
 
-export default Todo;
+export default TodoApp;

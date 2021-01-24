@@ -24,14 +24,18 @@ enum LoginMode {
     SignUp,
 }
 
-const Login = () => {
+const LoginApp = () => {
     const { register, logIn } = useAuth();
     // let history = useHistory();
     const [loginMode, setLoginMode] = useState(LoginMode.SignIn);
 
+    const googleSignIn = useCallback(async () => {
+        await wrapper(logIn({ googleLogin: true }));
+    }, [logIn]);
+
     const signIn = useCallback(
         async ({ email, password }: Values, { setSubmitting, setErrors }: FormikHelper) => {
-            const { error } = await wrapper(logIn(email, password));
+            const { error } = await wrapper(logIn({ email, password }));
             if (error) {
                 let errorMsg = {
                     email: '',
@@ -212,7 +216,7 @@ const Login = () => {
                                         {loginMode === LoginMode.SignIn && (
                                             <img
                                                 src={SignInButton}
-                                                onClick={submitForm}
+                                                onClick={() => googleSignIn()}
                                                 alt="Logo"
                                                 style={{ cursor: 'pointer' }}
                                             />
@@ -256,4 +260,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginApp;

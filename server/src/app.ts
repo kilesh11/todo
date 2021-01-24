@@ -31,7 +31,7 @@ class App {
 
     private routerSetup(): void {
         for (const route of router) {
-            this.app.use(route.getPath(), route.getRouter());
+            this.app.use(route.path, route.router);
         }
         //default return
         if (process.env.NODE_ENV === 'production') {

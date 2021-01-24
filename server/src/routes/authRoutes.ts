@@ -9,15 +9,15 @@ class UIRoutes extends MainRoute {
     constructor() {
         super();
         this.setRoutes();
-        this.setPath('/auth');
+        this.path = '/auth';
     }
 
     protected setRoutes(): void {
-        this.getRouter().use(cookieParser());
-        this.getRouter().use(bodyParser.json());
-        this.getRouter().route('/register').post(this.authController.signUp);
-        this.getRouter().route('/login').post(this.authController.signIn);
-        this.getRouter().route('/logout').post(this.authController.logout);
+        this.router.use(cookieParser());
+        this.router.use(bodyParser.json());
+        this.router.route('/register').post(this.authController.signUp);
+        this.router.route('/login').post(this.authController.signIn);
+        this.router.route('/logout').post(this.authController.logout);
     }
 }
 

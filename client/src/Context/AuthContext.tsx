@@ -1,15 +1,30 @@
-import { createContext, useContext, useState, useEffect, FunctionComponent, Dispatch } from 'react';
+import {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    FunctionComponent,
+    Dispatch,
+    useCallback,
+} from 'react';
 import { useHistory } from 'react-router-dom';
-import { auth } from '../Utility/firebase';
+import { auth, provider } from '../Utility/firebase';
 import { wrapper } from '../Utility/common';
 import firebase from 'firebase/app';
 import axios from 'axios';
-
 interface IAuthContext {
     user: firebase.User | null;
     setUser: Dispatch<firebase.User | null>;
     register: (email: string, password: string) => Promise<void>;
-    logIn: (email: string, password: string) => Promise<void>;
+    logIn: ({
+        email,
+        password,
+        googleLogin,
+    }: {
+        email?: string;
+        password?: string;
+        googleLogin?: boolean;
+    }) => Promise<void>;
 }
 
 const AuthContext = createContext<IAuthContext>({
@@ -28,40 +43,13 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     const [user, setUser] = useState<firebase.User | null>(null);
     let history = useHistory();
 
-    // const verify = async () => {
-    //     const { data } = await wrapper(axios.get('/ui/verify'));
-    //     if (data?.data?.success) {
-    //         setIsLoading(false);
-    //         setUser({ name: data.data.name, email: data.data.email });
-    //         return true;
-    //     }
-    //     setIsLoading(false);
-    //     return false;
-    // };
-
-    const register = async (email: string, password: string) => {
-        const { error } = await wrapper(auth.createUserWithEmailAndPassword(email, password));
-
-        if (error) {
-            return Promise.reject(error);
-        } else {
-            history.push('/');
-        }
-    };
-
-    const logIn = async (email: string, password: string) => {
-        const { error } = await wrapper(auth.signInWithEmailAndPassword(email, password));
-
-        if (error) {
-            return Promise.reject(error);
-        } else {
-            history.push('/');
-        }
-    };
-
     useEffect(() => {
         const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
             if (user) {
+                console.log(
+                    'kyle_debug ~ file: AuthContext.tsx ~ line 49 ~ unsubscribe ~ user',
+                    user,
+                );
                 setUser(user);
             } else {
                 setUser(null);
@@ -71,22 +59,61 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    axios.interceptors.response.use(
-        (response) => {
-            if (!response?.data?.success) {
-                if (['unauthorized', 'TokenExpiredError'].includes(response?.data?.msg)) {
-                    history.push('/login');
+    useEffect(() => {
+        axios.interceptors.response.use(
+            (response) => {
+                if (!response?.data?.success) {
+                    if (['unauthorized', 'TokenExpiredError'].includes(response?.data?.msg))
+                        history.push('/login');
+                    return response;
                 }
                 return response;
+            },
+            (error) => {
+                if (error.response.status === 401) history.push('/login');
+                return error;
+            },
+        );
+    }, [history]);
+
+    const register = useCallback(
+        async (email: string, password: string) => {
+            const { error } = await wrapper(auth.createUserWithEmailAndPassword(email, password));
+
+            if (error) {
+                return Promise.reject(error);
+            } else {
+                history.push('/');
             }
-            return response;
         },
-        (error) => {
-            if (error.response.status === 401) {
-                history.push('/login');
+        [history],
+    );
+
+    const logIn = useCallback(
+        async ({
+            email,
+            password,
+            googleLogin,
+        }: {
+            email?: string;
+            password?: string;
+            googleLogin?: boolean;
+        }) => {
+            if (googleLogin) {
+                const { error } = await wrapper(firebase.auth().signInWithPopup(provider));
+                console.log('kyle_debug ~ file: AuthContext.tsx ~ line 100 ~ error', error);
+                if (error) {
+                    return Promise.reject(error);
+                }
+            } else if (email && password) {
+                const { error } = await wrapper(auth.signInWithEmailAndPassword(email, password));
+                if (error) {
+                    return Promise.reject(error);
+                }
             }
-            return error;
+            history.push('/');
         },
+        [history],
     );
 
     return (

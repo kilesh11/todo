@@ -12,13 +12,13 @@ class UIRoutes extends MainRoute {
     constructor() {
         super();
         this.setRoutes();
-        this.setPath('/ui');
+        this.path = '/ui';
     }
 
     protected setRoutes(): void {
-        this.getRouter().use(cookieParser());
-        this.getRouter().use(bodyParser.json());
-        this.getRouter().route('/verify').get(checkAuth, this.uiController.verifyUser);
+        this.router.use(cookieParser());
+        this.router.use(bodyParser.json());
+        this.router.route('/verify').get(checkAuth, this.uiController.verifyUser);
     }
 }
 

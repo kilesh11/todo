@@ -9,5 +9,11 @@ const app = firebase.initializeApp({
     messagingSenderId: '448028693494',
     appId: '1:448028693494:web:06201487673b469746add7',
 });
+
+const GoogleAuthProvider = new firebase.auth.GoogleAuthProvider();
+// GoogleAuthProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+// firebase.auth().languageCode = 'it';
+
+export const provider = GoogleAuthProvider;
 export const auth = app.auth();
 export default app;
