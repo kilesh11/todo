@@ -1,0 +1,47 @@
+import User, { IUser } from './models/user';
+// import Todo from './models/todo';
+import admin from './config/firebase';
+import { ExpressContext } from 'apollo-server-express';
+
+interface IFirebaseContext extends ExpressContext {
+    currentUser?: admin.auth.DecodedIdToken;
+}
+
+// (parent, arg, context, info)
+
+const resolvers = {
+    Query: {
+        hello: (): string => 'Hello World!',
+        validateAuth: (parent: void, arg: void, context: IFirebaseContext): string | null => {
+            return context?.currentUser?.uid ?? null;
+        },
+        userbyEmail: async (parent: void, { email }: { email: string }): Promise<IUser | null> =>
+            await User.findOne({ email }),
+        userbyUid: async (parent: void, { uid }: { uid: string }): Promise<IUser | null> =>
+            await User.findOne({ uid }),
+    },
+    Mutation: {
+        createUser: async (parent: void, { user }: { user: IUser }): Promise<IUser> => {
+            console.log('kyle_debug ~ file: resovlers.ts ~ line 10 ~ createUser: ~ user', user);
+            const newUser = new User(user);
+            await newUser.save();
+            return newUser;
+        },
+        createUserIfNotExist: async (
+            parent: void,
+            { user }: { user: IUser },
+        ): Promise<IUser | null | void> => {
+            const query = { uid: user.uid };
+            const update = {
+                $setOnInsert: user,
+            };
+            const options = { new: true, upsert: true };
+            const newUser = await User.findOneAndUpdate(query, update, options).catch((error) =>
+                console.error(error),
+            );
+            return newUser;
+        },
+    },
+};
+
+export default resolvers;

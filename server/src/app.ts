@@ -2,7 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import router from './routes/router';
-import connectMongo from './config/db';
+import connectMongo from './config/mongo';
 // import { checkAuth } from './middleware/fireabase';
 // import passport from 'passport';
 // import { jwtStrategy } from './config/passport';

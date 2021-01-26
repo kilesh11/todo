@@ -1,23 +1,49 @@
 import app from './app';
+import admin from './config/firebase';
+import { ApolloServer } from 'apollo-server-express';
+import resolvers from './resovlers';
+import typeDefs from './typeDefs';
 
 function normalizePort(val: string) {
     const port = parseInt(val, 10);
 
-    if (isNaN(port)) {
-        // named pipe
-        return val;
-    }
+    if (isNaN(port)) return val;
 
-    if (port >= 0) {
-        // port number
-        return port;
-    }
+    if (port >= 0) return port;
 
     return false;
 }
 
-const port = normalizePort(process.env.PORT || '5000');
+const startServer = () => {
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: async ({ req, res }) => {
+            if (req.headers?.authorization?.startsWith('Bearer ')) {
+                const idToken = req.headers.authorization.split('Bearer ')[1];
+                try {
+                    const currentUser = await admin.auth().verifyIdToken(idToken);
+                    return { currentUser, req, res };
+                } catch (err) {
+                    return {
+                        req,
+                        res,
+                    };
+                }
+            } else {
+                return {
+                    req,
+                    res,
+                };
+            }
+        },
+    });
+    server.applyMiddleware({ app });
 
-app.listen(port, () => {
-    console.log('Express server listening on Port ', port);
-});
+    const port = normalizePort(process.env.PORT || '5000');
+    app.listen(port, () => {
+        console.log('Express Graphql server listening on Port ', port);
+    });
+};
+
+startServer();
