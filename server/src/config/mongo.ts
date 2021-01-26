@@ -12,6 +12,7 @@ const connect = async (): Promise<void> => {
         console.log('MongoDB reconnecting');
         setTimeout(() => {
             mongoose.connect(process.env.MONGOURI as string, {
+                useFindAndModify: false,
                 keepAlive: true,
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
@@ -25,6 +26,7 @@ const connect = async (): Promise<void> => {
 
     try {
         const conn = await mongoose.connect(process.env.MONGOURI as string, {
+            useFindAndModify: false,
             keepAlive: true,
             useNewUrlParser: true,
             useUnifiedTopology: true,
