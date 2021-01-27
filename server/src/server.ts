@@ -1,8 +1,8 @@
 import app from './app';
 import admin from './config/firebase';
 import { ApolloServer } from 'apollo-server-express';
-import resolvers from './resovlers';
-import typeDefs from './typeDefs';
+import resolvers from './resolvers/index';
+import typeDefs from './typeDefs/index';
 
 function normalizePort(val: string) {
     const port = parseInt(val, 10);
@@ -25,16 +25,10 @@ const startServer = () => {
                     const currentUser = await admin.auth().verifyIdToken(idToken);
                     return { currentUser, req, res };
                 } catch (err) {
-                    return {
-                        req,
-                        res,
-                    };
+                    return { req, res };
                 }
             } else {
-                return {
-                    req,
-                    res,
-                };
+                return { req, res };
             }
         },
     });

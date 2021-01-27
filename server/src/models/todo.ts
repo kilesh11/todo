@@ -1,11 +1,11 @@
 import { model, Schema, Document } from 'mongoose';
 
 enum todoStatus {
-    Pending = 'Pending',
-    InProgress = 'In Progress',
-    Completed = 'Completed',
-    Resolved = 'Resolved',
-    Archived = 'Archived',
+    PENDING = 'Pending',
+    INPROGRESS = 'In Progress',
+    COMPLETED = 'Completed',
+    RESOLVED = 'Resolved',
+    ARCHIVED = 'Archived',
 }
 
 export interface ITodo extends Document {
@@ -19,7 +19,6 @@ const TodoSchema: Schema<ITodo> = new Schema(
     {
         uid: {
             type: String,
-            unique: true,
             required: true,
         },
         title: {
@@ -32,7 +31,7 @@ const TodoSchema: Schema<ITodo> = new Schema(
         status: {
             type: String,
             enum: Object.values(todoStatus),
-            default: todoStatus.Pending,
+            default: todoStatus.PENDING,
             required: true,
         },
     },

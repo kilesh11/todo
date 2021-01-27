@@ -1,13 +1,6 @@
 import { gql } from 'apollo-server-express';
 
-const typeDefs = gql`
-    type Query {
-        hello: String
-        validateAuth: String
-        userbyEmail(email: String): User!
-        userbyUid(uid: String): User!
-    }
-
+export default gql`
     type User {
         id: String
         uid: String
@@ -21,11 +14,16 @@ const typeDefs = gql`
         name: String!
     }
 
-    type Mutation {
+    extend type Query {
+        hello: String
+        validateAuth: String
+        userbyEmail(email: String): User!
+        userbyUid(uid: String): User!
+    }
+
+    extend type Mutation {
         createUser(user: UserInput): User!
         createUserIfNotExist(user: UserInput): User
         # validateAuth: Boolean
     }
 `;
-
-export default typeDefs;

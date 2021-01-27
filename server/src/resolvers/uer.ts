@@ -1,24 +1,17 @@
-import User, { IUser } from './models/user';
-// import Todo from './models/todo';
-import admin from './config/firebase';
-import { ExpressContext } from 'apollo-server-express';
-
-interface IFirebaseContext extends ExpressContext {
-    currentUser?: admin.auth.DecodedIdToken;
-}
-
+import User, { IUser } from '../models/user';
+import Todo, { ITodo } from '../models/todo';
 // (parent, arg, context, info)
 
-const resolvers = {
+export default {
     Query: {
-        hello: (): string => 'Hello World!',
-        validateAuth: (parent: void, arg: void, context: IFirebaseContext): string | null => {
-            return context?.currentUser?.uid ?? null;
-        },
         userbyEmail: async (parent: void, { email }: { email: string }): Promise<IUser | null> =>
             await User.findOne({ email }),
         userbyUid: async (parent: void, { uid }: { uid: string }): Promise<IUser | null> =>
             await User.findOne({ uid }),
+    },
+    User: {
+        todo: async (parent: IUser): Promise<ITodo[] | null> =>
+            await Todo.find({ uid: parent.uid }),
     },
     Mutation: {
         createUser: async (parent: void, { user }: { user: IUser }): Promise<IUser> => {
@@ -43,5 +36,3 @@ const resolvers = {
         },
     },
 };
-
-export default resolvers;
