@@ -32,5 +32,13 @@ export default {
             await newTodo.save();
             return newTodo;
         },
+        updateTodo: async (
+            parent: void,
+            { _id, todo }: { _id: string; todo: ITodo },
+        ): Promise<ITodo | null> => {
+            console.log('kyle_debug ~ file: resovlers.ts ~ line 10 ~ createUser: ~ user', todo);
+            const updatedTodo = await Todo.findByIdAndUpdate(_id, todo, { new: true });
+            return updatedTodo;
+        },
     },
 };

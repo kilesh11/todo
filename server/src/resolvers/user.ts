@@ -1,13 +1,7 @@
 import User, { IUser } from '../models/user';
 import { ITodo } from '../models/todo';
-import { ExpressContext } from 'apollo-server-express';
-import Dataloader from 'dataloader';
+import { IDataLoaderContext } from '../interface/firebase';
 // (parent, arg, context, info)
-interface IDataLoaderContext extends ExpressContext {
-    dataLoaders: {
-        todoLoader: Dataloader<unknown, ITodo[]>;
-    };
-}
 
 export default {
     Query: {

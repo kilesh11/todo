@@ -10,8 +10,8 @@ export default gql`
     }
 
     type Todo {
-        id: String!
-        uid: String!
+        id: ID!
+        uid: ID!
         title: String!
         description: String
         status: TodoStatus!
@@ -20,7 +20,7 @@ export default gql`
     }
 
     input TodoInput {
-        uid: String!
+        uid: ID!
         title: String!
         description: String
         status: TodoStatus!
@@ -36,6 +36,7 @@ export default gql`
 
     extend type Mutation {
         createTodo(todo: TodoInput): Todo!
+        updateTodo(_id: ID, todo: TodoInput): Todo!
         # validateAuth: Boolean
     }
 `;
