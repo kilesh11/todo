@@ -3,6 +3,7 @@ import admin from './config/firebase';
 import { ApolloServer } from 'apollo-server-express';
 import resolvers from './resolvers/index';
 import typeDefs from './typeDefs/index';
+import todoLoader from './dataLoaders/todo';
 
 function normalizePort(val: string) {
     const port = parseInt(val, 10);
@@ -19,16 +20,17 @@ const startServer = () => {
         typeDefs,
         resolvers,
         context: async ({ req, res }) => {
+            const context = { req, res, dataLoaders: { todoLoader } };
             if (req.headers?.authorization?.startsWith('Bearer ')) {
                 const idToken = req.headers.authorization.split('Bearer ')[1];
                 try {
                     const currentUser = await admin.auth().verifyIdToken(idToken);
-                    return { currentUser, req, res };
+                    return { ...context, currentUser };
                 } catch (err) {
-                    return { req, res };
+                    return context;
                 }
             } else {
-                return { req, res };
+                return context;
             }
         },
     });

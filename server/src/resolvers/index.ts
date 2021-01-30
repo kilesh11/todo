@@ -1,6 +1,6 @@
 import { mergeResolvers } from '@graphql-tools/merge';
 import todoResolvers from './todo';
-import userResolvers from './uer';
+import userResolvers from './user';
 
 const resolvers = [todoResolvers, userResolvers];
 

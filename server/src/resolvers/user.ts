@@ -1,6 +1,13 @@
 import User, { IUser } from '../models/user';
-import Todo, { ITodo } from '../models/todo';
+import { ITodo } from '../models/todo';
+import { ExpressContext } from 'apollo-server-express';
+import Dataloader from 'dataloader';
 // (parent, arg, context, info)
+interface IDataLoaderContext extends ExpressContext {
+    dataLoaders: {
+        todoLoader: Dataloader<unknown, ITodo[]>;
+    };
+}
 
 export default {
     Query: {
@@ -11,12 +18,11 @@ export default {
         getAllUser: async (): Promise<IUser[] | null> => await User.find(),
     },
     User: {
-        todo: async (parent: IUser): Promise<ITodo[] | null> =>
-            await Todo.find({ uid: parent.uid }),
+        todos: async (parent: IUser, arg: void, ctx: IDataLoaderContext): Promise<ITodo[] | null> =>
+            ctx.dataLoaders.todoLoader.load(parent.uid),
     },
     Mutation: {
         createUser: async (parent: void, { user }: { user: IUser }): Promise<IUser> => {
-            console.log('kyle_debug ~ file: resovlers.ts ~ line 10 ~ createUser: ~ user', user);
             const newUser = new User(user);
             await newUser.save();
             return newUser;

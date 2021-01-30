@@ -27,7 +27,7 @@ export default gql`
     }
 
     extend type User {
-        todo: [Todo]
+        todos: [Todo]
     }
 
     extend type Query {
