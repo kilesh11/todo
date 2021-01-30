@@ -8,6 +8,7 @@ export default {
             await User.findOne({ email }),
         userbyUid: async (parent: void, { uid }: { uid: string }): Promise<IUser | null> =>
             await User.findOne({ uid }),
+        getAllUser: async (): Promise<IUser[] | null> => await User.find(),
     },
     User: {
         todo: async (parent: IUser): Promise<ITodo[] | null> =>

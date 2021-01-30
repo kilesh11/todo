@@ -19,6 +19,7 @@ export default gql`
         validateAuth: String
         userbyEmail(email: String): User!
         userbyUid(uid: String): User!
+        getAllUser: [User]!
     }
 
     extend type Mutation {

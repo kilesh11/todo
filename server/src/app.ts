@@ -18,7 +18,7 @@ class App {
     }
 
     private middlewareSetup(): void {
-        this.app.use(morgan('dev'));
+        // this.app.use(morgan('dev'));
         connectMongo();
         // this.app.use(checkAuth);
         // this.app.use(passport.initialize());
