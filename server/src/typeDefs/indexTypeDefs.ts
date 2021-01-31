@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express';
-import user from './user';
-import todo from './todo';
+import user from './userTypeDefs';
+import todo from './todoTypeDefs';
 
 export default gql`
     scalar DateTime

@@ -3,7 +3,7 @@ import UIController from '../controllers/uiController';
 // import AuthController from '../controllers/authController';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { checkAuth } from '../middleware/fireabase';
+import { checkAuth } from '../middleware/fireabaseMiddleware';
 
 class UIRoutes extends MainRoute {
     private uiController: UIController = new UIController();

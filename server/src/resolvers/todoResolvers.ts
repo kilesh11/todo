@@ -16,13 +16,14 @@ export default {
         RESOLVED: 'Resolved',
         ARCHIVED: 'Archived',
     },
-    Todo: {
-        description: (parent: ITodo): string => `override todo description ${parent.description}`,
-    },
     Query: {
         hello: (): string => 'Hello World!',
         validateAuth: (parent: void, arg: void, context: IFirebaseContext): string | null => {
             return context?.currentUser?.uid ?? null;
+        },
+        getTodoByUid: async (parent: void, { uid }: { uid: string }): Promise<ITodo[]> => {
+            const foundTodos = await Todo.find({ uid });
+            return foundTodos;
         },
     },
     Mutation: {
@@ -34,11 +35,16 @@ export default {
         },
         updateTodo: async (
             parent: void,
-            { _id, todo }: { _id: string; todo: ITodo },
+            { id, todo }: { id: string; todo: ITodo },
         ): Promise<ITodo | null> => {
             console.log('kyle_debug ~ file: resovlers.ts ~ line 10 ~ createUser: ~ user', todo);
-            const updatedTodo = await Todo.findByIdAndUpdate(_id, todo, { new: true });
+            const updatedTodo = await Todo.findByIdAndUpdate(id, todo, { new: true });
             return updatedTodo;
+        },
+        deleteTodo: async (parent: void, { id }: { id: string }): Promise<ITodo | null> => {
+            console.log('kyle_debug ~ file: todoResolvers.ts ~ line 44 ~ deleteTodo: ~ id', id);
+            const deletedTodo = await Todo.findByIdAndDelete(id);
+            return deletedTodo;
         },
     },
 };

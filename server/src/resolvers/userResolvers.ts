@@ -1,6 +1,6 @@
 import User, { IUser } from '../models/user';
 import { ITodo } from '../models/todo';
-import { IDataLoaderContext } from '../interface/firebase';
+import { IDataLoaderContext } from '../interface/IFirebase';
 // (parent, arg, context, info)
 
 export default {

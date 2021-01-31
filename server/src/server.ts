@@ -1,9 +1,9 @@
 import app from './app';
 import { ApolloServer } from 'apollo-server-express';
-import resolvers from './resolvers/index';
-import typeDefs from './typeDefs/index';
+import resolvers from './resolvers/indexResolvers';
+import typeDefs from './typeDefs/indexTypeDefs';
 import todoLoader from './dataLoaders/todo';
-import { checkAuth } from './middleware/fireabase';
+import { checkAuth } from './middleware/fireabaseMiddleware';
 
 function normalizePort(val: string) {
     const port = parseInt(val, 10);

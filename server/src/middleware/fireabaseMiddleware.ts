@@ -1,6 +1,6 @@
 import admin from '../config/firebase';
 import { Request } from 'express';
-import { IDataLoaderContext } from '../interface/firebase';
+import { IDataLoaderContext } from '../interface/IFirebase';
 
 // export const checkAuth = async (
 //     req: IFirebaseRequset,

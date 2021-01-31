@@ -31,12 +31,13 @@ export default gql`
     }
 
     extend type Query {
-        todobyUid(uid: String): Todo!
+        getTodoByUid(uid: ID): [Todo!]!
     }
 
     extend type Mutation {
         createTodo(todo: TodoInput): Todo!
-        updateTodo(_id: ID, todo: TodoInput): Todo!
+        updateTodo(id: ID, todo: TodoInput): Todo!
+        deleteTodo(id: ID): Todo!
         # validateAuth: Boolean
     }
 `;
