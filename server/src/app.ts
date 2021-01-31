@@ -3,6 +3,7 @@ import path from 'path';
 import router from './routes/router';
 import connectMongo from './config/mongo';
 import connectApollo from './config/apollo';
+// import morgan from 'morgan';
 // import { checkAuth } from './middleware/fireabase';
 // import passport from 'passport';
 // import { jwtStrategy } from './config/passport';
