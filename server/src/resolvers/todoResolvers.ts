@@ -28,7 +28,6 @@ export default {
     },
     Mutation: {
         createTodo: async (parent: void, { todo }: { todo: ITodo }): Promise<ITodo> => {
-            console.log('kyle_debug ~ file: resovlers.ts ~ line 10 ~ createUser: ~ user', todo);
             const newTodo = new Todo(todo);
             await newTodo.save();
             return newTodo;
@@ -37,12 +36,10 @@ export default {
             parent: void,
             { id, todo }: { id: string; todo: ITodo },
         ): Promise<ITodo | null> => {
-            console.log('kyle_debug ~ file: resovlers.ts ~ line 10 ~ createUser: ~ user', todo);
             const updatedTodo = await Todo.findByIdAndUpdate(id, todo, { new: true });
             return updatedTodo;
         },
         deleteTodo: async (parent: void, { id }: { id: string }): Promise<ITodo | null> => {
-            console.log('kyle_debug ~ file: todoResolvers.ts ~ line 44 ~ deleteTodo: ~ id', id);
             const deletedTodo = await Todo.findByIdAndDelete(id);
             return deletedTodo;
         },

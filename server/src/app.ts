@@ -1,8 +1,8 @@
 import express from 'express';
-import morgan from 'morgan';
 import path from 'path';
 import router from './routes/router';
 import connectMongo from './config/mongo';
+import connectApollo from './config/apollo';
 // import { checkAuth } from './middleware/fireabase';
 // import passport from 'passport';
 // import { jwtStrategy } from './config/passport';
@@ -20,6 +20,7 @@ class App {
     private middlewareSetup(): void {
         // this.app.use(morgan('dev'));
         connectMongo();
+        connectApollo(this.app);
         // this.app.use(checkAuth);
         // this.app.use(passport.initialize());
         // passport.use(jwtStrategy);
