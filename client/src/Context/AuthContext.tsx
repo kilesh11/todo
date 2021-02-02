@@ -116,6 +116,20 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         [history],
     );
 
+    // const setAuthorizationLink = setContext(async (request, previousContext) => {
+    //     const token = user && (await user.getIdToken());
+    //     console.log(
+    //         'kyle_debug ~ file: AuthContext.tsx ~ line 128 ~ setAuthorizationLink ~ user',
+    //         user?.email,
+    //     );
+    //     return {
+    //         headers: {
+    //             ...previousContext.headers,
+    //             authorization: `Bearer ${token}`,
+    //         },
+    //     };
+    // });
+
     return (
         <AuthContext.Provider value={{ setUser, register, logIn, user }}>
             {isLoading ? <span /> : children}

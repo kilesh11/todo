@@ -1,6 +1,7 @@
 import User, { IUser } from '../models/user';
 import { ITodo } from '../models/todo';
 import { IDataLoaderContext } from '../interface/IFirebase';
+import { AuthenticationError } from 'apollo-server-express';
 // (parent, arg, context, info)
 
 export default {
@@ -24,7 +25,16 @@ export default {
         createUserIfNotExist: async (
             parent: void,
             { user }: { user: IUser },
+            context: IDataLoaderContext,
         ): Promise<IUser | null | void> => {
+            if (!context?.currentUser && process.env.NODE_ENV === 'production') {
+                throw new AuthenticationError('must authenticate');
+            }
+            console.log(
+                'kyle_debug ~ file: userResolvers.ts ~ line 29 ~ context',
+                context?.currentUser?.email,
+            );
+            console.log('kyle_debug ~ file: userResolvers.ts ~ line 28 ~ user', user);
             const query = { uid: user.uid };
             const update = {
                 $setOnInsert: user,
