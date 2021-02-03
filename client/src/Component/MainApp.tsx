@@ -1,28 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, Typography } from '@material-ui/core';
 // import TodoApp from './TodoApp';
 import { auth } from '../Utility/firebase';
 import { useAuth } from '../Context/AuthContext';
 import { wrapper } from '../Utility/common';
-import { gql, useMutation } from '@apollo/client';
-
-const CREATE_USER_IF_NOT_EXIST = gql`
-    mutation CREATE_USER_IF_NOT_EXIST($newUser: UserInput!) {
-        createUserIfNotExist(user: $newUser) {
-            uid
-            email
-            name
-        }
-    }
-`;
+// import { useCreateUserIfNotExistMutation } from '../generated/graphql';
 
 const MainApp = () => {
     const [count, setCount] = useState(0);
     const [uid, setUid] = useState('');
     const { user } = useAuth();
 
-    const [createUserIfNotExist] = useMutation(CREATE_USER_IF_NOT_EXIST);
+    // const [createUserIfNotExist, { data, loading, error }] = useCreateUserIfNotExistMutation();
+    // console.log('kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ error', error);
+    // console.log('kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ loading', loading);
+    // console.log(
+    //     'kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ data',
+    //     data?.createUserIfNotExist?.email,
+    // );
+
     // #F56A57
     // #4E3C36
     // #F7EADC
@@ -47,24 +44,25 @@ const MainApp = () => {
         if (data.data.success) {
             setUid(data.data.uid);
         }
-        console.log('kyle_debug ~ file: Todo.tsx ~ line 24 ~ testAuth ~ data', data);
+        // console.log('kyle_debug ~ file: Todo.tsx ~ line 24 ~ testAuth ~ data', data);
     };
 
-    useEffect(() => {
-        (async () => {
-            const token = user && (await user.getIdToken());
-            createUserIfNotExist({
-                variables: {
-                    newUser: { uid: user?.uid, email: user?.email, name: user?.displayName ?? '' },
-                },
-                context: {
-                    headers: {
-                        authorization: `Bearer ${token}`,
-                    },
-                },
-            });
-        })();
-    }, [createUserIfNotExist, user]);
+    // useEffect(() => {
+    //     (async () => {
+    //         const token = user && (await user.getIdToken());
+    //         createUserIfNotExist({
+    //             variables: {
+    //                 user: { uid: user?.uid, email: user?.email, name: user?.displayName ?? '' },
+    //             },
+
+    //             context: {
+    //                 headers: {
+    //                     authorization: `Bearer ${token}`,
+    //                 },
+    //             },
+    //         });
+    //     })();
+    // }, [createUserIfNotExist, user]);
 
     return (
         <div

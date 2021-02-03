@@ -12,6 +12,7 @@ import { auth, provider } from '../Utility/firebase';
 import { wrapper } from '../Utility/common';
 import firebase from 'firebase/app';
 import axios from 'axios';
+import { useCreateUserIfNotExistMutation } from '../generated/graphql';
 interface IAuthContext {
     user: firebase.User | null;
     setUser: Dispatch<firebase.User | null>;
@@ -41,23 +42,36 @@ export const useAuth = () => {
 export const AuthProvider: FunctionComponent = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<firebase.User | null>(null);
+    const [createUserIfNotExist] = useCreateUserIfNotExistMutation();
     let history = useHistory();
 
     useEffect(() => {
-        const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+        console.log('kyle_debug ~ file: AuthContext.tsx ~ line 72 ~ useEffect didmount');
+        const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
-                console.log(
-                    'kyle_debug ~ file: AuthContext.tsx ~ line 49 ~ unsubscribe ~ user',
-                    user,
-                );
                 setUser(user);
+                const token = user && (await user.getIdToken());
+                await createUserIfNotExist({
+                    variables: {
+                        user: {
+                            uid: user?.uid,
+                            email: user?.email,
+                            name: user?.displayName ?? '',
+                        },
+                    },
+                    context: {
+                        headers: {
+                            authorization: `Bearer ${token}`,
+                        },
+                    },
+                });
             } else {
                 setUser(null);
             }
             setIsLoading(false);
         });
         return () => unsubscribe();
-    }, []);
+    }, [createUserIfNotExist]);
 
     useEffect(() => {
         axios.interceptors.response.use(
@@ -101,7 +115,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         }) => {
             if (googleLogin) {
                 const { error } = await wrapper(firebase.auth().signInWithPopup(provider));
-                console.log('kyle_debug ~ file: AuthContext.tsx ~ line 100 ~ error', error);
                 if (error) {
                     return Promise.reject(error);
                 }
