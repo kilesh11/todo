@@ -5,12 +5,19 @@ import { Button, Typography } from '@material-ui/core';
 import { auth } from '../Utility/firebase';
 import { useAuth } from '../Context/AuthContext';
 import { wrapper } from '../Utility/common';
-// import { useCreateUserIfNotExistMutation } from '../generated/graphql';
+import { useCreateTodoMutation, TodoInput, TodoStatus } from '../generated/graphql';
 
 const MainApp = () => {
     const [count, setCount] = useState(0);
     const [uid, setUid] = useState('');
     const { user } = useAuth();
+    const [todo, setTodo] = useState<TodoInput>({
+        uid: user?.uid ?? '',
+        title: 'testTitle',
+        description: 'testDescription',
+        status: TodoStatus.Pending,
+    });
+    console.log('kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ todo', todo);
 
     // const [createUserIfNotExist, { data, loading, error }] = useCreateUserIfNotExistMutation();
     // console.log('kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ error', error);
@@ -19,6 +26,13 @@ const MainApp = () => {
     //     'kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ data',
     //     data?.createUserIfNotExist?.email,
     // );
+    const [createTodoMutation, { data, loading, error }] = useCreateTodoMutation();
+    console.log('kyle_debug ~ file: MainApp.tsx ~ line 30 ~ MainApp ~ error', error);
+    console.log('kyle_debug ~ file: MainApp.tsx ~ line 30 ~ MainApp ~ loading', loading);
+    console.log(
+        'kyle_debug ~ file: MainApp.tsx ~ line 30 ~ MainApp ~ data',
+        new Date(data?.createTodo.createdAt),
+    );
 
     // #F56A57
     // #4E3C36
@@ -100,6 +114,22 @@ const MainApp = () => {
                 style={{ backgroundColor: '#122d54', marginBottom: '20px' }}
             >
                 <Typography style={{ color: 'white', fontSize: 20 }}>Press to Logout</Typography>
+            </Button>
+            <Button
+                onClick={async () => {
+                    const token = await user?.getIdToken();
+                    createTodoMutation({
+                        variables: { todo },
+                        context: {
+                            headers: {
+                                authorization: `Bearer ${token}`,
+                            },
+                        },
+                    });
+                }}
+                style={{ backgroundColor: '#122d54', marginBottom: '20px' }}
+            >
+                <Typography style={{ color: 'white', fontSize: 20 }}>Add Todo</Typography>
             </Button>
             {/* <TodoApp /> */}
         </div>

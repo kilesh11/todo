@@ -50,7 +50,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 setUser(user);
-                const token = user && (await user.getIdToken());
+                const token = await user?.getIdToken();
                 await createUserIfNotExist({
                     variables: {
                         user: {

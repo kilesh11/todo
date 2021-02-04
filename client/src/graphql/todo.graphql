@@ -1,0 +1,11 @@
+mutation createTodo($todo: TodoInput) {
+    createTodo(todo: $todo) {
+        id
+        uid
+        title
+        description
+        status
+        createdAt
+        updatedAt
+    }
+}

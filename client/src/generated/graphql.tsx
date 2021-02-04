@@ -125,6 +125,19 @@ export enum CacheControlScope {
 }
 
 
+export type CreateTodoMutationVariables = Exact<{
+  todo?: Maybe<TodoInput>;
+}>;
+
+
+export type CreateTodoMutation = (
+  { __typename?: 'Mutation' }
+  & { createTodo: (
+    { __typename?: 'Todo' }
+    & Pick<Todo, 'id' | 'uid' | 'title' | 'description' | 'status' | 'createdAt' | 'updatedAt'>
+  ) }
+);
+
 export type CreateUserIfNotExistMutationVariables = Exact<{
   user: UserInput;
 }>;
@@ -139,6 +152,44 @@ export type CreateUserIfNotExistMutation = (
 );
 
 
+export const CreateTodoDocument = gql`
+    mutation createTodo($todo: TodoInput) {
+  createTodo(todo: $todo) {
+    id
+    uid
+    title
+    description
+    status
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type CreateTodoMutationFn = Apollo.MutationFunction<CreateTodoMutation, CreateTodoMutationVariables>;
+
+/**
+ * __useCreateTodoMutation__
+ *
+ * To run a mutation, you first call `useCreateTodoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTodoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTodoMutation, { data, loading, error }] = useCreateTodoMutation({
+ *   variables: {
+ *      todo: // value for 'todo'
+ *   },
+ * });
+ */
+export function useCreateTodoMutation(baseOptions?: Apollo.MutationHookOptions<CreateTodoMutation, CreateTodoMutationVariables>) {
+        return Apollo.useMutation<CreateTodoMutation, CreateTodoMutationVariables>(CreateTodoDocument, baseOptions);
+      }
+export type CreateTodoMutationHookResult = ReturnType<typeof useCreateTodoMutation>;
+export type CreateTodoMutationResult = Apollo.MutationResult<CreateTodoMutation>;
+export type CreateTodoMutationOptions = Apollo.BaseMutationOptions<CreateTodoMutation, CreateTodoMutationVariables>;
 export const CreateUserIfNotExistDocument = gql`
     mutation createUserIfNotExist($user: UserInput!) {
   createUserIfNotExist(user: $user) {
