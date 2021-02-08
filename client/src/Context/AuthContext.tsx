@@ -13,6 +13,9 @@ import { wrapper } from '../Utility/common';
 import firebase from 'firebase/app';
 import axios from 'axios';
 import { useCreateUserIfNotExistMutation } from '../generated/graphql';
+import { ApolloProvider, ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { TypedTypePolicies } from '../generated/type-policies';
 interface IAuthContext {
     user: firebase.User | null;
     setUser: Dispatch<firebase.User | null>;
@@ -35,6 +38,26 @@ const AuthContext = createContext<IAuthContext>({
     logIn: async () => {},
 });
 
+const typePolicies: TypedTypePolicies = {
+    Todo: {
+        keyFields: ['id'],
+    },
+    User: {
+        keyFields: ['email'],
+    },
+    Query: {
+        fields: {
+            getTodoByUid: {
+                merge(existing, incoming) {
+                    return incoming;
+                },
+            },
+        },
+    },
+};
+
+const httpLink = createHttpLink({ uri: '/graphql' });
+
 export const useAuth = () => {
     return useContext(AuthContext);
 };
@@ -42,6 +65,7 @@ export const useAuth = () => {
 export const AuthProvider: FunctionComponent = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<firebase.User | null>(null);
+    const [token, setToken] = useState('');
     const [createUserIfNotExist] = useCreateUserIfNotExistMutation();
     let history = useHistory();
 
@@ -65,6 +89,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
                         },
                     },
                 });
+                setToken(token);
             } else {
                 setUser(null);
             }
@@ -129,23 +154,24 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
         [history],
     );
 
-    // const setAuthorizationLink = setContext(async (request, previousContext) => {
-    //     const token = user && (await user.getIdToken());
-    //     console.log(
-    //         'kyle_debug ~ file: AuthContext.tsx ~ line 128 ~ setAuthorizationLink ~ user',
-    //         user?.email,
-    //     );
-    //     return {
-    //         headers: {
-    //             ...previousContext.headers,
-    //             authorization: `Bearer ${token}`,
-    //         },
-    //     };
-    // });
+    const authLink = setContext((_, previousContext) => {
+        return {
+            headers: {
+                ...previousContext.headers,
+                authorization: `Bearer ${token}`,
+            },
+        };
+    });
+
+    const client = new ApolloClient({
+        link: authLink.concat(httpLink),
+        cache: new InMemoryCache({ typePolicies }),
+        connectToDevTools: true,
+    });
 
     return (
         <AuthContext.Provider value={{ setUser, register, logIn, user }}>
-            {isLoading ? <span /> : children}
+            <ApolloProvider client={client}>{isLoading ? <span /> : children}</ApolloProvider>
         </AuthContext.Provider>
     );
 };

@@ -3,6 +3,9 @@ schema: 'http://localhost:5000/graphql'
 documents:
     - './src/**/*.graphql'
 generates:
+    src/generated/type-policies.ts:
+        plugins:
+            - 'typescript-apollo-client-helpers'
     src/generated/graphql.tsx:
         plugins:
             - 'typescript'
