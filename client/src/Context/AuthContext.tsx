@@ -70,7 +70,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
     let history = useHistory();
 
     useEffect(() => {
-        console.log('kyle_debug ~ file: AuthContext.tsx ~ line 72 ~ useEffect didmount');
         const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 setUser(user);
