@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import { useImmer } from 'use-immer';
-import axios from 'axios';
+// import axios from 'axios';
 import {
     AppBar,
     Button,
@@ -16,41 +16,59 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
+    List,
+    ListItem,
+    ListItemText,
+    Divider,
+    ListItemSecondaryAction,
+    Chip,
+    ListItemIcon,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-// import TodoApp from './TodoApp';
+
 import { auth } from '../Utility/firebase';
 import { useAuth } from '../Context/AuthContext';
-import { wrapper } from '../Utility/common';
+// import { wrapper } from '../Utility/common';
 import {
     useCreateTodoMutation,
     useDeleteTodoMutation,
-    TodoInput,
+    useUpdateTodoMutation,
+    Todo,
     TodoStatus,
     useGetTodoByUidQuery,
     refetchGetTodoByUidQuery,
 } from '../generated/graphql';
 
+const genColor = (status: TodoStatus) => {
+    switch (status) {
+        case TodoStatus.Pending:
+            return '#5bc0de';
+        case TodoStatus.Inprogress:
+            return '#651fff';
+        case TodoStatus.Completed:
+            return '#5cb85c';
+        case TodoStatus.Resolved:
+            return '#f0ad4e';
+        case TodoStatus.Archived:
+            return '#4E3C36';
+    }
+};
+
 const MainApp = () => {
-    const [uid, setUid] = useState('');
     const { user } = useAuth();
     const [dialogOpen, setDialogOpen] = useImmer(false);
-    const [todo, setTodo] = useImmer<TodoInput>({
+    const [mode, setMode] = useImmer('create');
+    const [todo, setTodo] = useImmer<Todo>({
         uid: user?.uid ?? '',
+        id: '',
         title: '',
         description: '',
         status: TodoStatus.Pending,
     });
 
-    // const [createUserIfNotExist, { data, loading, error }] = useCreateUserIfNotExistMutation();
-    // console.log('kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ error', error);
-    // console.log('kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ loading', loading);
-    // console.log(
-    //     'kyle_debug ~ file: MainApp.tsx ~ line 16 ~ MainApp ~ data',
-    //     data?.createUserIfNotExist?.email,
-    // );
     const [createTodoMutation] = useCreateTodoMutation();
     const [deleteTodoMutation] = useDeleteTodoMutation();
+    const [updateTodoMutation] = useUpdateTodoMutation();
     const {
         data: getTodoData,
         // loading: getTodoLoading,
@@ -73,47 +91,32 @@ const MainApp = () => {
     // #E98074
     // #E85A4F
 
-    const testAuth = async () => {
-        const token = user && (await user.getIdToken());
-        const { data } = await wrapper(
-            axios.get('/ui/verify', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            }),
-        );
-        if (data.data.success) {
-            setUid(data.data.uid);
-        }
-        // console.log('kyle_debug ~ file: Todo.tsx ~ line 24 ~ testAuth ~ data', data);
-    };
+    // const testAuth = async () => {
+    //     const token = user && (await user.getIdToken());
+    //     const { data } = await wrapper(
+    //         axios.get('/ui/verify', {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         }),
+    //     );
+    //     if (data.data.success) {
+    //         setUid(data.data.uid);
+    //     }
+    //     // console.log('kyle_debug ~ file: Todo.tsx ~ line 24 ~ testAuth ~ data', data);
+    // };
 
-    // useEffect(() => {
-    //     // (async () => {
-    //     //     const token = user && (await user.getIdToken());
-    //     //     getTodoByUidLazyQuery({
-    //     //         variables: {
-    //     //             uid: user?.uid,
-    //     //         },
-    //     //         context: {
-    //     //             headers: {
-    //     //                 authorization: `Bearer ${token}`,
-    //     //             },
-    //     //         },
-    //     //     });
-    //     // })();
-    //     getTodoByUidLazyQuery({
-    //         variables: {
-    //             uid: user?.uid,
-    //         },
-    //         // context: {
-    //         //     headers: {
-    //         //         authorization: `Bearer ${token}`,
-    //         //     },
-    //         // },
-    //     });
-    // }, [getTodoByUidLazyQuery, user]);
+    const resetTodo = useCallback(() => {
+        console.log('kyle_debug ~ file: MainApp.tsx ~ line 129 ~ resetTodo ~ resetTodo');
+        setTodo(() => ({
+            uid: user?.uid ?? '',
+            id: '',
+            title: '',
+            description: '',
+            status: TodoStatus.Pending,
+        }));
+    }, [setTodo, user]);
 
     return (
         <>
@@ -144,65 +147,104 @@ const MainApp = () => {
                     overflow: 'auto',
                 }}
             >
-                <Button onClick={testAuth} style={{ backgroundColor: '#E98074' }}>
-                    <Typography style={{ color: 'white', fontSize: 20 }}>Test auth</Typography>
-                </Button>
-                <Typography style={{ fontSize: 20 }}>Uid: {uid}</Typography>
                 <Button
-                    onClick={() => setDialogOpen(() => true)}
+                    onClick={() => {
+                        setMode(() => 'create');
+                        setDialogOpen(() => true);
+                    }}
                     style={{ backgroundColor: '#E98074', marginBottom: '20px' }}
                 >
                     <Typography style={{ color: 'white', fontSize: 20 }}>Add Todo</Typography>
                 </Button>
-                {getTodoData?.getTodoByUid.map((todo) => (
-                    <span
-                        style={{
-                            background: 'white',
-                            margin: '10px 0px',
-                            padding: '5px 15px',
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                        key={todo.id}
-                    >
-                        <Typography style={{ fontSize: 20, paddingRight: 20 }}>
-                            Title: {todo.title}
-                        </Typography>
-                        <Typography style={{ fontSize: 20, paddingRight: 20 }}>
-                            Description: {todo.description}
-                        </Typography>
-                        <Typography style={{ fontSize: 20, paddingRight: 20 }}>
-                            status: {todo.status}
-                        </Typography>
-                        <IconButton
-                            onClick={() => {
-                                deleteTodoMutation({
-                                    variables: { id: todo.id },
-                                    // context,
-                                    awaitRefetchQueries: true,
-                                    refetchQueries: [refetchGetTodoByUidQuery({ uid: user?.uid })],
-                                });
-                            }}
-                        >
-                            <DeleteIcon style={{ color: '#E98074' }} />
-                        </IconButton>
-                    </span>
-                ))}
-                {/* <TodoApp /> */}
+                {(getTodoData?.getTodoByUid?.length ?? 0) > 0 && (
+                    <List style={{ backgroundColor: 'white', width: '100%', maxWidth: '20vw' }}>
+                        {getTodoData?.getTodoByUid.map((todo, i) => (
+                            <Fragment key={todo.id}>
+                                {i !== 0 && <Divider component="li" />}
+                                <ListItem alignItems="flex-start">
+                                    <ListItemIcon
+                                        style={{
+                                            width: '100px',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignSelf: 'center',
+                                            paddingRight: '16px',
+                                        }}
+                                    >
+                                        <Chip
+                                            style={{
+                                                backgroundColor: genColor(todo.status),
+                                                color: 'white',
+                                            }}
+                                            label={todo?.status}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        onClick={() => {
+                                            setMode(() => 'update');
+                                            setTodo(() => ({
+                                                uid: todo?.uid ?? '',
+                                                id: todo.id,
+                                                title: todo?.title,
+                                                description: todo?.description,
+                                                status: todo?.status,
+                                            }));
+                                            setDialogOpen(() => true);
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                        primaryTypographyProps={{
+                                            style: {
+                                                fontWeight: 'bold',
+                                            },
+                                        }}
+                                        primary={todo.title}
+                                        secondary={
+                                            <Typography
+                                                component="span"
+                                                variant="body2"
+                                                // className={classes.inline}
+                                                color="textPrimary"
+                                            >
+                                                <pre style={{ fontFamily: 'inherit' }}>
+                                                    {todo.description}
+                                                </pre>
+                                            </Typography>
+                                        }
+                                    />
+                                    <ListItemSecondaryAction>
+                                        <IconButton
+                                            onClick={() => {
+                                                deleteTodoMutation({
+                                                    variables: { id: todo.id },
+                                                    // context,
+                                                    awaitRefetchQueries: true,
+                                                    refetchQueries: [
+                                                        refetchGetTodoByUidQuery({
+                                                            uid: user?.uid,
+                                                        }),
+                                                    ],
+                                                });
+                                            }}
+                                        >
+                                            <DeleteIcon style={{ color: '#E98074' }} />
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            </Fragment>
+                        ))}
+                    </List>
+                )}
                 <Dialog
                     open={dialogOpen}
                     onClose={() => {
                         setDialogOpen(() => false);
-                        setTodo(() => ({
-                            uid: user?.uid ?? '',
-                            title: '',
-                            description: '',
-                            status: TodoStatus.Pending,
-                        }));
+                        resetTodo();
                     }}
                     aria-labelledby="form-dialog-title"
                 >
-                    <DialogTitle id="form-dialog-title">Create</DialogTitle>
+                    <DialogTitle id="form-dialog-title">
+                        {mode === 'update' ? 'Update' : 'Create'}
+                    </DialogTitle>
                     <DialogContent>
                         <TextField
                             autoFocus
@@ -211,6 +253,7 @@ const MainApp = () => {
                             label="Title"
                             fullWidth
                             value={todo.title}
+                            spellCheck={false}
                             onChange={(e) =>
                                 setTodo((draft) => {
                                     draft.title = e.target.value;
@@ -222,7 +265,11 @@ const MainApp = () => {
                             id="description"
                             label="Description"
                             fullWidth
+                            multiline
+                            rows={4}
+                            rowsMax={4}
                             value={todo.description}
+                            spellCheck={false}
                             onChange={(e) =>
                                 setTodo((draft) => {
                                     draft.description = e.target.value;
@@ -255,12 +302,7 @@ const MainApp = () => {
                         <Button
                             onClick={() => {
                                 setDialogOpen(() => false);
-                                setTodo(() => ({
-                                    uid: user?.uid ?? '',
-                                    title: '',
-                                    description: '',
-                                    status: TodoStatus.Pending,
-                                }));
+                                resetTodo();
                             }}
                             color="primary"
                         >
@@ -269,23 +311,27 @@ const MainApp = () => {
                         <Button
                             disabled={todo.title === ''}
                             onClick={async () => {
-                                await createTodoMutation({
-                                    variables: { todo },
-                                    // context,
-                                    awaitRefetchQueries: true,
-                                    refetchQueries: [refetchGetTodoByUidQuery({ uid: user?.uid })],
-                                });
+                                if (mode === 'create') {
+                                    const { id, ...todoInput } = todo;
+                                    await createTodoMutation({
+                                        variables: { todo: todoInput },
+                                        awaitRefetchQueries: true,
+                                        refetchQueries: [
+                                            refetchGetTodoByUidQuery({ uid: user?.uid }),
+                                        ],
+                                    });
+                                } else if (mode === 'update') {
+                                    const { id, ...todoInput } = todo;
+                                    await updateTodoMutation({
+                                        variables: { id, todo: todoInput },
+                                    });
+                                }
                                 setDialogOpen(() => false);
-                                setTodo(() => ({
-                                    uid: user?.uid ?? '',
-                                    title: '',
-                                    description: '',
-                                    status: TodoStatus.Pending,
-                                }));
+                                resetTodo();
                             }}
                             color="primary"
                         >
-                            Add
+                            {mode === 'update' ? 'Update' : 'Add'}
                         </Button>
                     </DialogActions>
                 </Dialog>
