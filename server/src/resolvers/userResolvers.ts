@@ -30,7 +30,7 @@ export default {
             if (!context?.currentUser && process.env.NODE_ENV === 'production') {
                 throw new AuthenticationError('must authenticate');
             }
-            console.log('kyle_debug ~ file: userResolvers.ts ~ line 28 ~ user', user);
+            // console.log('kyle_debug ~ file: userResolvers.ts ~ line 28 ~ user', user);
             const query = { uid: user.uid };
             const update = {
                 $setOnInsert: user,

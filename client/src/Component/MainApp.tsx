@@ -1,5 +1,6 @@
 import React, { Fragment, useCallback } from 'react';
 import { useImmer } from 'use-immer';
+import { makeStyles } from '@material-ui/core/styles';
 // import axios from 'axios';
 import {
     AppBar,
@@ -54,8 +55,31 @@ const genColor = (status: TodoStatus) => {
     }
 };
 
+const useStyles = makeStyles({
+    root: {
+        '& label.Mui-focused': {
+            color: '#E98074',
+        },
+        '& .MuiInput-underline:after': {
+            borderBottomColor: '#E98074',
+        },
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: '#E98074',
+            },
+            '&:hover fieldset': {
+                borderColor: '#F56A57',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: '#E98074',
+            },
+        },
+    },
+});
+
 const MainApp = () => {
     const { user } = useAuth();
+    const classes = useStyles();
     const [dialogOpen, setDialogOpen] = useImmer(false);
     const [mode, setMode] = useImmer('create');
     const [todo, setTodo] = useImmer<Todo>({
@@ -104,11 +128,10 @@ const MainApp = () => {
     //     if (data.data.success) {
     //         setUid(data.data.uid);
     //     }
-    //     // console.log('kyle_debug ~ file: Todo.tsx ~ line 24 ~ testAuth ~ data', data);
+
     // };
 
     const resetTodo = useCallback(() => {
-        console.log('kyle_debug ~ file: MainApp.tsx ~ line 129 ~ resetTodo ~ resetTodo');
         setTodo(() => ({
             uid: user?.uid ?? '',
             id: '',
@@ -117,6 +140,21 @@ const MainApp = () => {
             status: TodoStatus.Pending,
         }));
     }, [setTodo, user]);
+
+    const keyPress = useCallback(
+        async (e: React.KeyboardEvent<HTMLDivElement>) => {
+            const { id, ...todoInput } = todo;
+            if (e.key === 'Enter' && todoInput.title !== '') {
+                await createTodoMutation({
+                    variables: { todo: todoInput },
+                    awaitRefetchQueries: true,
+                    refetchQueries: [refetchGetTodoByUidQuery({ uid: user?.uid })],
+                });
+                resetTodo();
+            }
+        },
+        [createTodoMutation, todo, user, resetTodo],
+    );
 
     return (
         <>
@@ -141,23 +179,47 @@ const MainApp = () => {
                     height: 'calc(100vh - 64px)',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'center',
                     alignItems: 'center',
                     backgroundColor: '#EAE7DC',
                     overflow: 'auto',
                 }}
             >
-                <Button
+                <TextField
+                    id="outlined-basic"
+                    label="Create Todo"
+                    variant="outlined"
+                    autoFocus
+                    value={todo.title}
+                    spellCheck={false}
+                    onKeyDown={keyPress}
+                    classes={{
+                        root: classes.root,
+                    }}
+                    style={{ top: '20%', width: '100%', maxWidth: '20vw', marginBottom: '10px' }}
+                    onChange={(e) =>
+                        setTodo((draft) => {
+                            draft.title = e.target.value;
+                        })
+                    }
+                />
+                {/* <Button
                     onClick={() => {
                         setMode(() => 'create');
                         setDialogOpen(() => true);
                     }}
-                    style={{ backgroundColor: '#E98074', marginBottom: '20px' }}
+                    style={{ backgroundColor: '#E98074', marginBottom: '20px', top: '20%' }}
                 >
                     <Typography style={{ color: 'white', fontSize: 20 }}>Add Todo</Typography>
-                </Button>
+                </Button> */}
                 {(getTodoData?.getTodoByUid?.length ?? 0) > 0 && (
-                    <List style={{ backgroundColor: 'white', width: '100%', maxWidth: '20vw' }}>
+                    <List
+                        style={{
+                            backgroundColor: 'white',
+                            width: '100%',
+                            maxWidth: '20vw',
+                            top: '20%',
+                        }}
+                    >
                         {getTodoData?.getTodoByUid.map((todo, i) => (
                             <Fragment key={todo.id}>
                                 {i !== 0 && <Divider component="li" />}
@@ -169,6 +231,7 @@ const MainApp = () => {
                                             justifyContent: 'center',
                                             alignSelf: 'center',
                                             paddingRight: '16px',
+                                            marginTop: '0px',
                                         }}
                                     >
                                         <Chip
@@ -199,16 +262,18 @@ const MainApp = () => {
                                         }}
                                         primary={todo.title}
                                         secondary={
-                                            <Typography
-                                                component="span"
-                                                variant="body2"
-                                                // className={classes.inline}
-                                                color="textPrimary"
-                                            >
-                                                <pre style={{ fontFamily: 'inherit' }}>
-                                                    {todo.description}
-                                                </pre>
-                                            </Typography>
+                                            todo.description !== '' && (
+                                                <Typography
+                                                    component="span"
+                                                    variant="body2"
+                                                    // className={classes.inline}
+                                                    color="textPrimary"
+                                                >
+                                                    <pre style={{ fontFamily: 'inherit' }}>
+                                                        {todo.description}
+                                                    </pre>
+                                                </Typography>
+                                            )
                                         }
                                     />
                                     <ListItemSecondaryAction>

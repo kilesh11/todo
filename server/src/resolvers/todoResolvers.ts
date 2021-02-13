@@ -25,10 +25,10 @@ export default {
             if (!context?.currentUser && process.env.NODE_ENV === 'production') {
                 throw new AuthenticationError('must authenticate');
             }
-            console.log(
-                'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ getTodoByUid: ~ context?.currentUser',
-                context?.currentUser?.email,
-            );
+            // console.log(
+            //     'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ getTodoByUid: ~ context?.currentUser',
+            //     context?.currentUser?.email,
+            // );
             const foundTodos = await Todo.find({ uid });
             return foundTodos;
         },
@@ -42,10 +42,10 @@ export default {
             if (!context?.currentUser && process.env.NODE_ENV === 'production') {
                 throw new AuthenticationError('must authenticate');
             }
-            console.log(
-                'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ createTodo: ~ context?.currentUser',
-                context?.currentUser?.email,
-            );
+            // console.log(
+            //     'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ createTodo: ~ context?.currentUser',
+            //     context?.currentUser?.email,
+            // );
             const newTodo = new Todo(todo);
             await newTodo.save();
             return newTodo;
@@ -58,10 +58,10 @@ export default {
             if (!context?.currentUser && process.env.NODE_ENV === 'production') {
                 throw new AuthenticationError('must authenticate');
             }
-            console.log(
-                'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ updateTodo: ~ context?.currentUser',
-                context?.currentUser?.email,
-            );
+            // console.log(
+            //     'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ updateTodo: ~ context?.currentUser',
+            //     context?.currentUser?.email,
+            // );
             const updatedTodo = await Todo.findByIdAndUpdate(id, todo, { new: true });
             return updatedTodo;
         },
@@ -73,10 +73,10 @@ export default {
             if (!context?.currentUser && process.env.NODE_ENV === 'production') {
                 throw new AuthenticationError('must authenticate');
             }
-            console.log(
-                'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ deleteTodo: ~ context?.currentUser',
-                context?.currentUser?.email,
-            );
+            // console.log(
+            //     'kyle_debug ~ file: todoResolvers.ts ~ line 36 ~ deleteTodo: ~ context?.currentUser',
+            //     context?.currentUser?.email,
+            // );
             const deletedTodo = await Todo.findByIdAndDelete(id);
             return deletedTodo;
         },

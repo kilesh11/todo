@@ -25,7 +25,7 @@ const connect = async (): Promise<void> => {
     connection.on('error', (err) => console.log('MongoDB Connection Error:', err));
 
     try {
-        mongoose.set('debug', true);
+        if (process.env.NODE_ENV === 'development') mongoose.set('debug', true);
         const conn = await mongoose.connect(process.env.MONGOURI as string, {
             useFindAndModify: false,
             keepAlive: true,
