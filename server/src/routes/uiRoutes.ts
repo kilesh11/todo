@@ -3,7 +3,7 @@ import UIController from '../controllers/uiController';
 // import AuthController from '../controllers/authController';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { checkAuth } from '../middleware/fireabase';
+import { checkRestAuth } from '../middleware/fireabaseMiddleware';
 
 class UIRoutes extends MainRoute {
     private uiController: UIController = new UIController();
@@ -18,7 +18,7 @@ class UIRoutes extends MainRoute {
     protected setRoutes(): void {
         this.router.use(cookieParser());
         this.router.use(bodyParser.json());
-        this.router.route('/verify').get(checkAuth, this.uiController.verifyUser);
+        this.router.route('/verify').get(checkRestAuth, this.uiController.verifyUser);
     }
 }
 

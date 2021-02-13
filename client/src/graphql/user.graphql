@@ -1,0 +1,7 @@
+mutation createUserIfNotExist($user: UserInput!) {
+    createUserIfNotExist(user: $user) {
+        uid
+        email
+        name
+    }
+}

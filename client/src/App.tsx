@@ -1,7 +1,7 @@
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import ProtectedRoute from './Component/ProtectedRoute';
 import LoginApp from './Component/LoginApp';
-import TodoApp from './Component/TodoApp';
+import MainApp from './Component/MainApp';
 
 // #F56A57
 // #4E3C36
@@ -16,10 +16,10 @@ import TodoApp from './Component/TodoApp';
 
 const App = () => {
     return (
-        <>
+        <Switch>
             <Route path="/login" exact component={LoginApp} />
-            <ProtectedRoute path="/" exact component={TodoApp} />
-        </>
+            <ProtectedRoute path="/" exact component={MainApp} />
+        </Switch>
     );
 };
 

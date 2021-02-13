@@ -58,7 +58,6 @@ const LoginApp = () => {
                 }
                 setErrors(errorMsg);
             }
-            setSubmitting(false);
         },
         [logIn],
     );

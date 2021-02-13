@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { IFirebaseRequset } from '../interface/firebase';
+import { IFirebaseRequset } from '../interface/IFirebase';
 
 class UIController {
     public verifyUser(req: IFirebaseRequset, res: Response): Response {

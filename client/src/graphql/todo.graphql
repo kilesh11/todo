@@ -1,0 +1,47 @@
+query getTodoByUid($uid: ID) {
+    getTodoByUid(uid: $uid) {
+        id
+        uid
+        title
+        description
+        status
+        createdAt
+        updatedAt
+    }
+}
+
+mutation createTodo($todo: TodoInput) {
+    createTodo(todo: $todo) {
+        id
+        uid
+        title
+        description
+        status
+        createdAt
+        updatedAt
+    }
+}
+
+mutation updateTodo($id: ID, $todo: TodoInput) {
+    updateTodo(id: $id, todo: $todo) {
+        id
+        uid
+        title
+        description
+        status
+        updatedAt
+        createdAt
+    }
+}
+
+mutation deleteTodo($id: ID) {
+    deleteTodo(id: $id) {
+        id
+        uid
+        title
+        description
+        status
+        updatedAt
+        createdAt
+    }
+}
