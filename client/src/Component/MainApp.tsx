@@ -26,7 +26,6 @@ import {
     ListItemIcon,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-
 import { auth } from '../Utility/firebase';
 import { useAuth } from '../Context/AuthContext';
 // import { wrapper } from '../Utility/common';
@@ -37,6 +36,8 @@ import {
     Todo,
     TodoStatus,
     useGetTodoByUidQuery,
+    GetTodoByUidDocument,
+    GetTodoByUidQuery,
     refetchGetTodoByUidQuery,
 } from '../generated/graphql';
 
@@ -93,6 +94,7 @@ const MainApp = () => {
     const [createTodoMutation] = useCreateTodoMutation();
     const [deleteTodoMutation] = useDeleteTodoMutation();
     const [updateTodoMutation] = useUpdateTodoMutation();
+    // const [createUserIfNotExist] = useCreateUserIfNotExistMutation();
     const {
         data: getTodoData,
         // loading: getTodoLoading,
@@ -103,6 +105,22 @@ const MainApp = () => {
             uid: user?.uid,
         },
     });
+
+    // useEffect(() => {
+    //     (async () => {
+    //         if (user) {
+    //             await createUserIfNotExist({
+    //                 variables: {
+    //                     user: {
+    //                         uid: user?.uid,
+    //                         email: user?.email,
+    //                         name: user?.displayName ?? '',
+    //                     },
+    //                 },
+    //             });
+    //         }
+    //     })();
+    // }, [user, createUserIfNotExist]);
 
     // #F56A57
     // #4E3C36
@@ -147,8 +165,25 @@ const MainApp = () => {
             if (e.key === 'Enter' && todoInput.title !== '') {
                 await createTodoMutation({
                     variables: { todo: todoInput },
-                    awaitRefetchQueries: true,
-                    refetchQueries: [refetchGetTodoByUidQuery({ uid: user?.uid })],
+                    update: (cache, { data }) => {
+                        const todoData = cache.readQuery<GetTodoByUidQuery>({
+                            query: GetTodoByUidDocument,
+                            variables: {
+                                uid: user?.uid,
+                            },
+                        });
+                        cache.writeQuery<GetTodoByUidQuery>({
+                            query: GetTodoByUidDocument,
+                            variables: {
+                                uid: user?.uid,
+                            },
+                            data: {
+                                getTodoByUid: [...todoData!.getTodoByUid, data!.createTodo],
+                            },
+                        });
+                    },
+                    // awaitRefetchQueries: true,
+                    // refetchQueries: [refetchGetTodoByUidQuery({ uid: user?.uid })],
                 });
                 resetTodo();
             }
@@ -281,13 +316,34 @@ const MainApp = () => {
                                             onClick={() => {
                                                 deleteTodoMutation({
                                                     variables: { id: todo.id },
-                                                    // context,
-                                                    awaitRefetchQueries: true,
-                                                    refetchQueries: [
-                                                        refetchGetTodoByUidQuery({
-                                                            uid: user?.uid,
-                                                        }),
-                                                    ],
+                                                    update: (cache, { data }) => {
+                                                        const todoData = cache.readQuery<GetTodoByUidQuery>(
+                                                            {
+                                                                query: GetTodoByUidDocument,
+                                                                variables: {
+                                                                    uid: user?.uid,
+                                                                },
+                                                            },
+                                                        );
+                                                        cache.writeQuery<GetTodoByUidQuery>({
+                                                            query: GetTodoByUidDocument,
+                                                            variables: {
+                                                                uid: user?.uid,
+                                                            },
+                                                            data: {
+                                                                getTodoByUid: todoData!.getTodoByUid.filter(
+                                                                    (todo) =>
+                                                                        todo.id !==
+                                                                        data!.deleteTodo.id,
+                                                                ),
+                                                            },
+                                                        });
+                                                    },
+                                                    // refetchQueries: [
+                                                    //     refetchGetTodoByUidQuery({
+                                                    //         uid: user?.uid,
+                                                    //     }),
+                                                    // ],
                                                 });
                                             }}
                                         >
@@ -389,6 +445,28 @@ const MainApp = () => {
                                     const { id, ...todoInput } = todo;
                                     await updateTodoMutation({
                                         variables: { id, todo: todoInput },
+                                        update: (cache, { data }) => {
+                                            const todoData = cache.readQuery<GetTodoByUidQuery>({
+                                                query: GetTodoByUidDocument,
+                                                variables: {
+                                                    uid: user?.uid,
+                                                },
+                                            });
+                                            cache.writeQuery<GetTodoByUidQuery>({
+                                                query: GetTodoByUidDocument,
+                                                variables: {
+                                                    uid: user?.uid,
+                                                },
+                                                data: {
+                                                    getTodoByUid: todoData!.getTodoByUid.map(
+                                                        (todo) =>
+                                                            todo.id !== data?.updateTodo.id
+                                                                ? todo
+                                                                : data?.updateTodo,
+                                                    ),
+                                                },
+                                            });
+                                        },
                                     });
                                 }
                                 setDialogOpen(() => false);
