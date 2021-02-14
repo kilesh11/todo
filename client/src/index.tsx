@@ -5,23 +5,14 @@ import './index.css';
 import App from './App';
 import { AuthProvider } from './Context/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
-import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
-
-const link = new HttpLink({ uri: '/graphql' });
-const client = new ApolloClient({
-    link,
-    cache: new InMemoryCache(),
-});
 
 ReactDOM.render(
     <React.StrictMode>
-        <ApolloProvider client={client}>
-            <BrowserRouter>
-                <AuthProvider>
-                    <App />
-                </AuthProvider>
-            </BrowserRouter>
-        </ApolloProvider>
+        <BrowserRouter>
+            <AuthProvider>
+                <App />
+            </AuthProvider>
+        </BrowserRouter>
     </React.StrictMode>,
     document.getElementById('root'),
 );

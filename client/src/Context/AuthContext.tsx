@@ -82,11 +82,6 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
                             name: user?.displayName ?? '',
                         },
                     },
-                    context: {
-                        headers: {
-                            authorization: `Bearer ${token}`,
-                        },
-                    },
                 });
                 setToken(token);
             } else {
