@@ -38,7 +38,9 @@ const AuthContext = createContext<IAuthContext>({
     logIn: async () => {},
 });
 
-const httpLink = createHttpLink({ uri: '/graphql' });
+const httpLink = createHttpLink({
+    uri: `${process.env.REACT_APP_GRAPHQL_URL ?? ''}/graphql`,
+});
 
 const typePolicies: TypedTypePolicies = {
     Todo: {
