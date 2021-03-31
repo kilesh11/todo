@@ -1,0 +1,27 @@
+FROM node:lts-alpine as server_builder
+
+WORKDIR /usr/src/app
+
+COPY /server/package.json /server/yarn.lock ./
+
+RUN yarn
+
+COPY server/. .
+
+RUN yarn build
+
+#================================================================
+
+FROM node:lts-alpine
+
+WORKDIR /usr/src/app
+
+COPY /server/package.json /server/yarn.lock ./
+
+RUN yarn --prod
+
+COPY --from=server_builder /usr/src/app/dist /usr/src/app/
+
+EXPOSE 80
+
+CMD ["yarn", "run", "prod" ]

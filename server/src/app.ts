@@ -14,7 +14,7 @@ class App {
     constructor() {
         this.app = express();
         this.middlewareSetup();
-        this.assetSetup();
+        this.assetSetup(process.env.WITH_CLIENT === 'true');
         this.routerSetup();
     }
 
@@ -27,8 +27,8 @@ class App {
         // passport.use(jwtStrategy);
     }
 
-    private assetSetup(): void {
-        this.app.use(express.static(path.join(__dirname, 'build')));
+    private assetSetup(withClient: boolean): void {
+        if (withClient) this.app.use(express.static(path.join(__dirname, 'build')));
     }
 
     private routerSetup(): void {
@@ -36,7 +36,7 @@ class App {
             this.app.use(route.path, route.router);
         }
         //default return
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' && process.env.WITH_CLIENT === 'true') {
             this.app.get('/*', (req, res) => {
                 res.sendFile(path.join(__dirname, 'build', 'index.html'));
             });
