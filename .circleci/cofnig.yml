@@ -1,0 +1,32 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: 
+          name: "Build Docker Image"
+          command: >-
+            docker build 
+              --no-cache
+              -f Dockerfile.server
+              -t $DOCKER_USER/ts-express-todo:latest
+              -t $DOCKER_USER/ts-express-todo:$CIRCLE_TAG
+              .
+          name: "Login Dockerhub"
+          command: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          name: "Push Docker image"
+          command: docker push --all-tags $DOCKER_USER/ts-express-todo
+
+workflows:
+  build:
+      jobs:
+        - build:
+            filters:
+              tags:
+                only: /.*/
+              branches:
+                ignore: /.*/
+
