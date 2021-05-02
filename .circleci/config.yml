@@ -13,13 +13,13 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Docker image
-          command: >-
+          command: >
             docker build 
-              --no-cache
-              -f Dockerfile.server
-              -t $IMAGE_NAME:latest
-              -t $IMAGE_NAME:$CIRCLE_TAG
-              .
+            --no-cache
+            -f Dockerfile.server
+            -t $IMAGE_NAME:latest
+            -t $IMAGE_NAME:$CIRCLE_TAG
+            .
       - run:
           name: Archive Docker image
           command: docker save -o image.tar $IMAGE_NAME
