@@ -37,9 +37,12 @@ class App {
         }
         //default return
         if (process.env.NODE_ENV === 'production' && process.env.WITH_CLIENT === 'true') {
+            console.log('Express Graphql server started with client ');
             this.app.get('/*', (req, res) => {
                 res.sendFile(path.join(__dirname, 'build', 'index.html'));
             });
+        } else {
+            console.log('Express Graphql server started with no client ');
         }
     }
 }
