@@ -13,6 +13,7 @@ function normalizePort(val: string) {
 const startServer = () => {
     const port = normalizePort(process.env.PORT || '5000');
     app.listen(port, () => {
+        console.log('Express Graphql server Version: ', process.env.CONT_IMG_VER || 'development');
         console.log('Express Graphql server listening on Port ', port);
     });
 };
