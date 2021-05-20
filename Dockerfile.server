@@ -1,4 +1,4 @@
-ARG CONT_IMG_VER
+
 FROM node:lts-alpine as server_builder
 
 WORKDIR /usr/src/app
@@ -14,7 +14,11 @@ RUN yarn build
 #================================================================
 
 FROM node:lts-alpine
+
+ARG CONT_IMG_VER
+
 ENV CONT_IMG_VER=${CONT_IMG_VER:-v1.0.0}
+
 WORKDIR /usr/src/app
 
 COPY /server/package.json /server/yarn.lock ./
