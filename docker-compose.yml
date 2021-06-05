@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+    prod_server:
+        image: kyles11/ts-express-todo:latest
+        container_name: todo_server
+        env_file:
+            - ./.env
+        command: yarn prod
+    watchtower:
+        image: containrrr/watchtower
+        environment:
+            - TZ=Asia/Hong_Kong
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        command: --interval 30 todo_server
