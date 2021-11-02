@@ -12,6 +12,7 @@ const server = new ApolloServer({
         await checkAuth(req, { req, res, dataLoaders: { todoLoader } }),
 });
 
-export default (app: express.Application): void => {
+export default async (app: express.Application): Promise<void> => {
+    await server.start()
     server.applyMiddleware({ app });
 };
